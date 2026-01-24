@@ -6,7 +6,6 @@
 | The routes file is used for defining the HTTP routes.
 |
 */
-
 import RecipeController from '#controllers/recipeController'
 import router from '@adonisjs/core/services/router'
 
@@ -17,16 +16,10 @@ router.get('/', async () => {
 })
 
 router.group(() => {
-  router.get('/', async () => {
-    const controller = new RecipeController()
-    return controller.index()
-  })
-  router.get('/:id', async (ctx) => {
-    const controller = new RecipeController()
-    return controller.show(ctx)
-  })
-  router.post('/', 'RecipesController.store')
-  router.put('/:id', 'RecipesController.update')
-  router.delete('/:id', 'RecipesController.delete')
+  router.get('/', [RecipeController, 'index'])
+  router.post('/', [RecipeController, 'store'])
+  router.get('/:id', [RecipeController, 'show'])
+  router.put('/:id', [RecipeController, 'update'])
+  router.delete('/:id', [RecipeController, 'delete'])
 })
 .prefix('/recipes')
