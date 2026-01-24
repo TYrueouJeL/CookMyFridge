@@ -13,7 +13,9 @@ export default class Ingredient extends BaseModel {
   @manyToMany(() => Recipe, {
     pivotTable: 'recipe_ingredient',
     pivotForeignKey: 'ingredient_id',
-    pivotRelatedForeignKey: 'recipe_id'
+    pivotRelatedForeignKey: 'recipe_id',
+    pivotColumns: ['quantity', 'unit'],
+    pivotTimestamps: true
   })
   declare ingredients: ManyToMany<typeof Recipe>
 
