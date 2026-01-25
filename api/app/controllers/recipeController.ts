@@ -26,7 +26,7 @@ export default class RecipeController {
 
     public async store({ request, response }: HttpContext) {
         const payload: CreateRecipeDTO = await request.validateUsing(createRecipeValidator)
-        const recipe =  this.recipeService.create(payload)
+        const recipe =  await this.recipeService.create(payload)
         return response.created(recipe)
     }
 
