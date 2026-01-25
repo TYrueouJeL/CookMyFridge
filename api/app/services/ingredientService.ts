@@ -26,6 +26,10 @@ export default class IngredientService {
 
     public async delete(id: number) {
         const ingredient = await Ingredient.findOrFail(id)
+
+        if (!ingredient) return false
+
         await ingredient.delete()
+        return true
     }
 }

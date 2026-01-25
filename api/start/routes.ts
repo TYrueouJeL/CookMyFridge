@@ -19,17 +19,26 @@ router.get('/', async () => {
 router.group(() => {
   router.get('/', [RecipeController, 'index'])
   router.post('/', [RecipeController, 'store'])
-  router.get('/:id', [RecipeController, 'show'])
-  router.put('/:id', [RecipeController, 'update'])
-  router.delete('/:id', [RecipeController, 'delete'])
+  router.get('/:recipeId', [RecipeController, 'show'])
+  router.put('/:recipeId', [RecipeController, 'update'])
+  router.delete('/:recipeId', [RecipeController, 'delete'])
+
+  router.group(() => {
+    router.get('/', [RecipeController, 'indexIngredients'])
+    router.post('/', [RecipeController, 'addIngredient'])
+    router.get('/:ingredientId', [RecipeController, 'showIngredient'])
+    router.put('/:ingredientId', [RecipeController, 'updateIngredient'])
+    router.delete('/:ingredientId', [RecipeController, 'removeIngredient'])
+  })
+  .prefix('/:recipeId/ingredients')
 })
 .prefix('/recipes')
 
 router.group(() => {
   router.get('/', [IngredientController, 'index'])
   router.post('/', [IngredientController, 'store'])
-  router.get('/:id', [IngredientController, 'show'])
-  router.put('/:id', [IngredientController, 'update'])
-  router.delete('/:id', [IngredientController, 'delete'])
+  router.get('/:ingredientId', [IngredientController, 'show'])
+  router.put('/:ingredientId', [IngredientController, 'update'])
+  router.delete('/:ingredientId', [IngredientController, 'delete'])
 })
 .prefix('/ingredients')
