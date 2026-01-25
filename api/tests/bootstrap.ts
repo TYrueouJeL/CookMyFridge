@@ -5,6 +5,10 @@ import type { Config } from '@japa/runner/types'
 import { pluginAdonisJS } from '@japa/plugin-adonisjs'
 import testUtils from '@adonisjs/core/services/test_utils'
 
+console.log('NODE_ENV=', process.env.NODE_ENV)
+console.log('DB_CONNECTION=', process.env.DB_CONNECTION)
+console.log('DB_DATABASE=', process.env.DB_DATABASE)
+
 /**
  * This file is imported by the "bin/test.ts" entrypoint file
  */
@@ -23,7 +27,9 @@ export const plugins: Config['plugins'] = [assert(), apiClient(), pluginAdonisJS
  * The teardown functions are executed after all the tests
  */
 export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
-  setup: [],
+  setup: [
+    () => testUtils.db().migrate()
+  ],
   teardown: [],
 }
 

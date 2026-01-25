@@ -16,7 +16,9 @@ export default class RecipeService {
         const recipe = await Recipe
             .query()
             .where('id', id)
-            .preload('ingredients')
+            .preload('ingredients', (query) => {
+                query.pivotColumns(['quantity', 'unit'])
+            })
             .firstOrFail()
         
         return {
@@ -25,8 +27,8 @@ export default class RecipeService {
             ingredients: recipe.ingredients.map((ingredient) => ({
                 id: ingredient.id,
                 name: ingredient.name,
-                quantity: ingredient.$extras.quantity,
-                unit: ingredient.$extras.unit
+                quantity: ingredient.$extras.pivot_quantity,
+                unit: ingredient.$extras.pivot_unit
             }))
         }
     }
