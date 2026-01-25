@@ -3,11 +3,27 @@ import { CreateIngredientDTO, UpdateIngredientDTO } from "../dto/ingredientDTO.j
 
 export default class IngredientService {
     public async list() {
-        return Ingredient.all()
+        const ingredients = await Ingredient.query()
+
+        return ingredients.map((ingredient) => ({
+            id: ingredient.id,
+            name: ingredient.name
+        }))
     }
 
     public async findById(id: number) {
-        return Ingredient.findOrFail(id)
+        const ingredient = await Ingredient
+            .query()
+            .where('id', id)
+            .preload('ingredients', (query) => {
+                query.pivotColumns(['quantity', 'unit'])
+            })
+            .firstOrFail()
+        
+        return {
+            id: ingredient.id,
+            name: ingredient.name
+        }
     }
 
     public async create (data: CreateIngredientDTO) {
@@ -20,7 +36,7 @@ export default class IngredientService {
     ) {
         const ingredient = await Ingredient.findOrFail(id)
         ingredient.merge(data)
-        ingredient.save()
+        await ingredient.save()
         return ingredient
     }
 

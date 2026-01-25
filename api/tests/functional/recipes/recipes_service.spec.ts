@@ -45,7 +45,7 @@ test.group('Recipes service', (group) => {
         assert.equal(recipe.name, 'Pizza')
     })
 
-    test('RecipeService.update met à jour une recette', async ({ assert }) => {
+    test('RecipeService.update modifie une recette', async ({ assert }) => {
         const recipe = await Recipe.create({ name: 'Soup' })
         
         const service = new RecipeService()
