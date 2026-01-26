@@ -4,6 +4,12 @@ import db from "@adonisjs/lucid/services/db";
 import { UnitEnum } from "../../app/enums/unitEnum.js";
 import { BaseSeeder } from "@adonisjs/lucid/seeders";
 
+function randomEnumValue<T extends object>(enumObj: T): T[keyof T] {
+    const values = Object.values(enumObj)
+    return values[Math.floor(Math.random() * values.length)]
+}
+
+
 export default class RecipeIngredientSeeder extends BaseSeeder {
     public async run() {
         await db.from('recipe_ingredient').delete()
@@ -26,7 +32,7 @@ export default class RecipeIngredientSeeder extends BaseSeeder {
             for (const ingredient of selectedIngredients) {
                 pivotData[ingredient.id] = {
                     quantity: Math.floor(Math.random() * 500) + 1,
-                    unit: UnitEnum.GRAM,
+                    unit: randomEnumValue(UnitEnum),
                 }
             }
 
