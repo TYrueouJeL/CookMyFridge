@@ -56,6 +56,43 @@ export default class RecipeService {
         return true
     }
 
+    public async indexIngredients(recipeId: number) {
+        const recipe = await Recipe.query()
+            .where('id', recipeId)
+            .preload('ingredients', (query) => query.pivotColumns(['quantity', 'unit']))
+            .firstOrFail()
+        
+        const ingredients: RecipeIngredientDTO[] = recipe.ingredients.map((ingredient) => ({
+            id: ingredient.id,
+            recipeId: recipe.id,
+            ingredientId: ingredient.id,
+            quantity: ingredient.$extras.pivot_quantity,
+            unit: ingredient.$extras.pivot_unit
+        }))
+
+        return ingredients
+    }
+    
+    public async showIngredient(recipeId: number, ingredientId: number) {
+        const recipe = await Recipe.query().where('id', recipeId).preload('ingredients', (query) => {
+            query.where('ingredients.id', ingredientId)
+        })
+        .firstOrFail()
+
+        const ingredient = recipe.ingredients[0]
+
+        if (!ingredient) {
+            throw new Error('Ingredient not found in this recipe')
+        }
+
+        return {
+            id: ingredient.id,
+            name: ingredient.name,
+            quantity: ingredient.$extras.pivot_quantity,
+            unit: ingredient.$extras.pivot_unit,
+        }
+    }
+
     public async addIngredient(recipeId: number, data: CreateRecipeIngredientDTO) {
         const recipe = await Recipe.findOrFail(recipeId)
 
@@ -65,6 +102,20 @@ export default class RecipeService {
                 unit: data.unit
             }
         })
+
+        const ingredient = await recipe
+            .related('ingredients')
+            .query()
+            .where('ingredients.id', data.ingredientId)
+            .pivotColumns(['quantity', 'unit'])
+            .firstOrFail()
+
+        return {
+            id: ingredient.id,
+            name: ingredient.name,
+            quantity: ingredient.$extras.pivot_quantity,
+            unit: ingredient.$extras.pivot_unit,
+        }
     }
 
     public async updateIngredient(recipeId: number, ingredientId: number, data: UpdateRecipeIngredientDTO) {
@@ -73,16 +124,27 @@ export default class RecipeService {
         const affectedRows = await recipe
             .related('ingredients')
             .pivotQuery()
-            .where('ingredients.id', ingredientId)
+            .where('ingredient_id', ingredientId)
             .update({
-                quantiy: data.quantity,
+                quantity: data.quantity,
                 unit: data.unit
             })
         
         if (affectedRows.length === 0) return null
 
-        const ingredient = await recipe.related('ingredients').query().where('ingredients.id', ingredientId).first()
-        return ingredient
+        const ingredient = await recipe
+            .related('ingredients')
+            .query()
+            .where('ingredients.id', ingredientId)
+            .pivotColumns(['quantity', 'unit'])
+            .firstOrFail()
+        
+        return {
+            id: ingredient.id,
+            name: ingredient.name,
+            quantity: ingredient.$extras.pivot_quantity,
+            unit: ingredient.$extras.pivot_unit
+        }
     }
 
     public async removeIngredient(recipeId: number, ingredientId: number) {
@@ -98,42 +160,5 @@ export default class RecipeService {
 
         await recipe.related('ingredients').detach([ingredientId])
         return true
-    }
-
-    public async indexIngredients(recipeId: number) {
-        const recipe = await Recipe.query()
-            .where('id', recipeId)
-            .preload('ingredients', (query) => query.pivotColumns(['quantity', 'unit']))
-            .firstOrFail()
-        
-        const ingredients: RecipeIngredientDTO[] = recipe.ingredients.map((ingredient) => ({
-            id: ingredient.id,
-            recipeId: recipe.id,
-            ingredientId: ingredient.id,
-            quantity: ingredient.$extras.quantity,
-            unit: ingredient.$extras.unit
-        }))
-
-        return ingredients
-    }
-    
-    public async showRecipeIngredient(recipeId: number, ingredientId: number) {
-        const recipe = await Recipe.query().where('id', recipeId).preload('ingredients', (query) => {
-            query.where('ingredients.id', ingredientId)
-        })
-        .firstOrFail()
-
-        const ingredient = recipe.ingredients[0]
-
-        if (!ingredient) {
-            throw new Error('Ingredient not found in this recipe')
-        }
-
-        return {
-            id: ingredient.id,
-            name: ingredient.name,
-            quantity: ingredient.$extras.quantity,
-            unit: ingredient.$extras.unit,
-        }
     }
 }

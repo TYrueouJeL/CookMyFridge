@@ -61,7 +61,7 @@ export default class RecipeController {
 
     public async showIngredient({ params, response }: HttpContext) {
         const { recipeId, ingredientId } = params
-        const ingredient = await this.recipeService.showRecipeIngredient(recipeId, ingredientId)
+        const ingredient = await this.recipeService.showIngredient(recipeId, ingredientId)
 
         if (!ingredient) {
             return response.notFound({ message: 'Ingredient not found' })
