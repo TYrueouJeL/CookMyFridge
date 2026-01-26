@@ -100,8 +100,6 @@ test.group('RecipeIngredient controller', (group) => {
             unit: 'kg'
         })
 
-        console.log(response.body())
-
         assert.equal(response.status(), 200)
         assert.equal(response.body().id, ingredients[0].id)
         assert.equal(response.body().quantity, 5)

@@ -8,7 +8,8 @@ export default class RecipeService {
 
         return recipes.map((recipe) => ({
             id: recipe.id,
-            name: recipe.name
+            name: recipe.name,
+            description: recipe.description
         }))
     }
 
@@ -24,6 +25,7 @@ export default class RecipeService {
         return {
             id: recipe.id,
             name: recipe.name,
+            description: recipe.description,
             ingredients: recipe.ingredients.map((ingredient) => ({
                 id: ingredient.id,
                 name: ingredient.name,

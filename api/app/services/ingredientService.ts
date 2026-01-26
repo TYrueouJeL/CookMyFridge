@@ -7,7 +7,7 @@ export default class IngredientService {
 
         return ingredients.map((ingredient) => ({
             id: ingredient.id,
-            name: ingredient.name
+            name: ingredient.name,
         }))
     }
 
@@ -22,7 +22,7 @@ export default class IngredientService {
         
         return {
             id: ingredient.id,
-            name: ingredient.name
+            name: ingredient.name,
         }
     }
 

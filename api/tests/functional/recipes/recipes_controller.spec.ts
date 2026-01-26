@@ -8,34 +8,36 @@ test.group('Recipes controller', (group) => {
 
   test('GET /recipes', async ({ client, assert }) => {
     await Recipe.createMany([
-      { name: 'Pizza' },
-      { name: 'Burger' }
+      { name: 'Pizza', description: 'This is a Pizza' },
+      { name: 'Burger', description: 'This is a Burger' }
     ])
 
     const response = await client.get('/recipes').send()
 
     assert.equal(response.status(), 200)
     assert.lengthOf(response.body(), 2)
-    assert.deepInclude(response.body()[0], { name: 'Pizza' })
+    assert.deepInclude(response.body()[0], { name: 'Pizza', description: 'This is a Pizza' })
   })
 
   test('POST /recipes', async ({ client, assert }) => {
     const response = await client.post('/recipes').json({
-      name: 'Pizza'
+      name: 'Pizza',
+      description: 'This is a Pizza'
     })
 
     assert.equal(response.status(), 201)
-
     assert.exists(response.body().id)
     assert.equal(response.body().name, 'Pizza')
+    assert.equal(response.body().description, 'This is a Pizza')
 
     const recipeInDb = await Recipe.find(response.body().id)
     assert.exists(recipeInDb)
     assert.equal(recipeInDb!.name, 'Pizza')
+    assert.equal(recipeInDb!.description, 'This is a Pizza')
   })
 
   test('GET /recipes/:recipeId', async ({ client, assert }) => {
-    const recipe = await Recipe.create({ name: 'Pizza' })
+    const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a Pizza' })
 
     const ingredients = await Ingredient.createMany([
       { name: 'Potato flour' },
@@ -52,7 +54,7 @@ test.group('Recipes controller', (group) => {
     assert.equal(response.status(), 200)
     assert.equal(response.body().id, recipe.id)
     assert.equal(response.body().name, recipe.name)
-
+    assert.equal(response.body().description, 'This is a Pizza')
     assert.lengthOf(response.body().ingredients, 2)
 
     assert.deepInclude(response.body().ingredients, {
@@ -71,23 +73,26 @@ test.group('Recipes controller', (group) => {
   })
 
   test('PUT /recipes/:recipeId', async ({ client, assert }) => {
-    const recipe = await Recipe.create({ name: 'Pizza' })
+    const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a Pizza' })
 
     const response = await client.put(`/recipes/${recipe.id}`).json({
-      name: 'Burger'
+      name: 'Burger',
+      description: 'This is a Burger'
     })
 
     assert.equal(response.status(), 200)
     assert.equal(response.body().id, recipe.id)
     assert.equal(response.body().name, 'Burger')
+    assert.equal(response.body().description, 'This is a Burger')
 
     const recipeInDb = await Recipe.find(recipe.id)
     assert.exists(recipeInDb)
     assert.equal(recipeInDb!.name, 'Burger')
+    assert.equal(recipeInDb!.description, 'This is a Burger')
   })
 
   test('DELETE /recipes/:recipeId', async ({ client, assert }) => {
-    const recipe = await Recipe.create({ name: 'Pizza' })
+    const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a Pizza' })
 
     const response = await client.delete(`/recipes/${recipe.id}`)
 

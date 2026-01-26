@@ -8,7 +8,7 @@ type IngredientType = {
 export class IngredientSeederFactory {
     static async create(data: IngredientType = {}) {
         return Ingredient.create({
-            name: data.name ||faker.food.ingredient()
+            name: data.name ||faker.food.ingredient(),
         })
     }
 

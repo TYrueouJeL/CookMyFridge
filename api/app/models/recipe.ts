@@ -10,6 +10,9 @@ export default class Recipe extends BaseModel {
   @column()
   declare name: string
 
+  @column()
+  declare description: string
+
   @manyToMany(() => Ingredient, {
     pivotTable: 'recipe_ingredient',
     pivotForeignKey: 'recipe_id',

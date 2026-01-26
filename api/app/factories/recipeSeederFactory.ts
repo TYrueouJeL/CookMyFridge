@@ -3,12 +3,14 @@ import { faker } from '@faker-js/faker'
 
 type RecipeType = {
     name?: string
+    description?: string
 }
 
 export class RecipeSeederFactory {
     static async create(data: RecipeType = {}) {
         return Recipe.create({
-            name: data.name || faker.food.dish()
+            name: data.name || faker.food.dish(),
+            description: data.description || faker.food.description(),
         })
     }
 
