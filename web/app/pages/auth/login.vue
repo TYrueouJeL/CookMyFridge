@@ -3,11 +3,16 @@
         <!-- Titre dynamique -->
         <h1 class="text-3xl font-bold mb-6">{{ isConnection ? 'Connexion' : 'Inscription' }}</h1>
 
-        <AsyncState :loading="loading" :error="error">
+        <AsyncState :loading="loading" :error="null">
             <form
                 @submit.prevent="submit"
                 class="border rounded-lg border-gray-300 p-6 space-y-6 mx-80"
             >
+                <!-- Message d'erreur d'authentification -->
+                <div v-if="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    {{ error }}
+                </div>
+
                 <!-- Champ Email - dans les deux cas -->
                 <div>
                     <label class="block font-semibold mb-1">Email</label>
@@ -120,7 +125,7 @@ const validate = () => {
     // Validation du mot de passe
     if (!form.password.trim()) {
         errors.password = 'Le mot de passe est obligatoire'
-    } else if (!/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(form.password)) {
+    } else if (!isConnection.value && !/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(form.password)) {
         errors.password = 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial'
     }
 
@@ -162,7 +167,12 @@ const submit = async () => {
         }
         await router.push(`/`)
     } catch (e: any) {
-        error.value = e.message ?? 'Erreur de l\'authentification'
+        // Afficher un message d'erreur approprié
+        if (isConnection.value && (e.message === 'Erreur API' || e.message?.includes('401') || e.message?.includes('Unauthorized'))) {
+            error.value = 'Identifiants invalides'
+        } else {
+            error.value = e.message ?? 'Erreur de l\'authentification'
+        }
         loading.value = false
     }
 }

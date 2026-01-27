@@ -3,14 +3,14 @@ import { computed, readonly, onMounted } from 'vue'
 export const useAuth = () => {
     const token = useState<string | null>('auth.token', () => {
         // Récupérer le token du localStorage au démarrage (côté client uniquement)
-        if (process.client) {
+        if (typeof window !== 'undefined') {
             return localStorage.getItem('authToken')
         }
         return null
     })
 
     // S'assurer que le token est chargé au démarrage côté client
-    if (process.client) {
+    if (typeof window !== 'undefined') {
         onMounted(() => {
             const storedToken = localStorage.getItem('authToken')
             if (storedToken && token.value !== storedToken) {
@@ -21,14 +21,14 @@ export const useAuth = () => {
 
     const setToken = (newToken: string) => {
         token.value = newToken
-        if (process.client) {
+        if (typeof window !== 'undefined') {
             localStorage.setItem('authToken', newToken)
         }
     }
 
     const clearToken = () => {
         token.value = null
-        if (process.client) {
+        if (typeof window !== 'undefined') {
             localStorage.removeItem('authToken')
         }
     }
