@@ -6,6 +6,8 @@ export interface UserDTO {
     email: string
     password: string
     recipes: Recipe[]
+    createdAt: string
+    updatedAt: string
 }
 
 export interface CreateUserDTO {

@@ -30,4 +30,6 @@ export interface RecipeDTO {
         quantity: any
         unit: any
     }>
+    createdAt: string
+    updatedAt: string
 }

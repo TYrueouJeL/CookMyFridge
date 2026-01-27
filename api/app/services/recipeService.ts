@@ -14,7 +14,9 @@ export default class RecipeService {
                 id: recipe.user.id,
                 fullName: recipe.user.fullName,
                 email: recipe.user.email
-            }
+            },
+            createdAt: recipe.createdAt.toISO(),
+            updatedAt: recipe.updatedAt.toISO()
         }))
     }
 
@@ -42,7 +44,9 @@ export default class RecipeService {
                 name: ingredient.name,
                 quantity: ingredient.$extras.pivot_quantity,
                 unit: ingredient.$extras.pivot_unit
-            }))
+            })),
+            createdAt: recipe.createdAt.toISO(),
+            updatedAt: recipe.updatedAt.toISO()
         }
     }
 
@@ -72,7 +76,7 @@ export default class RecipeService {
     public async indexIngredients(recipeId: number) {
         const recipe = await Recipe.query()
             .where('id', recipeId)
-            .preload('ingredients', (query) => query.pivotColumns(['quantity', 'unit']))
+            .preload('ingredients', (query) => query.pivotColumns(['quantity', 'unit', 'created_at', 'updated_at']))
             .firstOrFail()
         
         const ingredients: RecipeIngredientDTO[] = recipe.ingredients.map((ingredient) => ({
@@ -80,7 +84,9 @@ export default class RecipeService {
             recipeId: recipe.id,
             ingredientId: ingredient.id,
             quantity: ingredient.$extras.pivot_quantity,
-            unit: ingredient.$extras.pivot_unit
+            unit: ingredient.$extras.pivot_unit,
+            createdAt: ingredient.$extras.pivot_created_at,
+            updatedAt: ingredient.$extras.pivot_updated_at
         }))
 
         return ingredients
@@ -88,7 +94,7 @@ export default class RecipeService {
     
     public async showIngredient(recipeId: number, ingredientId: number) {
         const recipe = await Recipe.query().where('id', recipeId).preload('ingredients', (query) => {
-            query.where('ingredients.id', ingredientId)
+            query.where('ingredients.id', ingredientId).pivotColumns(['quantity', 'unit', 'created_at', 'updated_at'])
         })
         .firstOrFail()
 
@@ -103,6 +109,8 @@ export default class RecipeService {
             name: ingredient.name,
             quantity: ingredient.$extras.pivot_quantity,
             unit: ingredient.$extras.pivot_unit,
+            createdAt: ingredient.$extras.pivot_created_at,
+            updatedAt: ingredient.$extras.pivot_updated_at
         }
     }
 
@@ -120,7 +128,7 @@ export default class RecipeService {
             .related('ingredients')
             .query()
             .where('ingredients.id', data.ingredientId)
-            .pivotColumns(['quantity', 'unit'])
+            .pivotColumns(['quantity', 'unit', 'created_at', 'updated_at'])
             .firstOrFail()
 
         return {
@@ -128,6 +136,8 @@ export default class RecipeService {
             name: ingredient.name,
             quantity: ingredient.$extras.pivot_quantity,
             unit: ingredient.$extras.pivot_unit,
+            createdAt: ingredient.$extras.pivot_created_at,
+            updatedAt: ingredient.$extras.pivot_updated_at
         }
     }
 
@@ -149,14 +159,16 @@ export default class RecipeService {
             .related('ingredients')
             .query()
             .where('ingredients.id', ingredientId)
-            .pivotColumns(['quantity', 'unit'])
+            .pivotColumns(['quantity', 'unit', 'created_at', 'updated_at'])
             .firstOrFail()
         
         return {
             id: ingredient.id,
             name: ingredient.name,
             quantity: ingredient.$extras.pivot_quantity,
-            unit: ingredient.$extras.pivot_unit
+            unit: ingredient.$extras.pivot_unit,
+            createdAt: ingredient.$extras.pivot_created_at,
+            updatedAt: ingredient.$extras.pivot_updated_at
         }
     }
 
