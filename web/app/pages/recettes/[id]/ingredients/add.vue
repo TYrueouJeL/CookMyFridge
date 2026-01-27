@@ -79,6 +79,10 @@ import IngredientService from '~/services/api/ingredientApi'
 import RecipeService from '~/services/api/recipeApi'
 import type { IngredientType } from '~/types/IngredientType'
 
+definePageMeta({
+    middleware: 'auth'
+})
+
 const route = useRoute()
 const router = useRouter()
 

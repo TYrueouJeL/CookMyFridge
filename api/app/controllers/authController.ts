@@ -1,14 +1,16 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import User from '#models/user'
+import { CreateUserDTO } from '../dto/userDTO.js'
+import { createUserValidator } from '#validators/userValidators'
+import UserService from '#services/userService'
 
 export default class AuthController {
-    async register({ request, response }: HttpContext) {
-        const data = request.only(['email', 'password'])
+    private userService = new UserService()
 
-        const user = await User.create({
-            email: data.email,
-            password: data.password
-        })
+    async register({ request, response }: HttpContext) {
+        const payload: CreateUserDTO = await request.validateUsing(createUserValidator)
+
+        const user = await this.userService.create(payload)
 
         const token = await User.accessTokens.create(user)
 

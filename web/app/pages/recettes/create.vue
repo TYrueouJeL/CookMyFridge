@@ -57,6 +57,10 @@ import type { CreateRecipeDTO } from '~/types/RecipeType'
 
 const router = useRouter()
 
+definePageMeta({
+    middleware: 'auth'
+})
+
 const loading = ref(false)
 const error = ref<string | null>(null)
 

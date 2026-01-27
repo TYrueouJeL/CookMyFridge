@@ -24,6 +24,7 @@
                     Accueil
                     </a>
 
+                    <!-- Afficher Recettes si connecté -->
                     <a
                     href="/recettes"
                     class="relative text-gray-700 transition-colors duration-300
@@ -35,6 +36,34 @@
                     >
                     Recettes
                     </a>
+
+                    <!-- Afficher Se connecter si NOT connecté -->
+                    <a
+                    v-if="!isAuthenticated"
+                    href="/auth/login"
+                    class="relative text-gray-700 transition-colors duration-300
+                            hover:text-green-600
+                            after:content-[''] after:absolute after:left-0 after:-bottom-1
+                            after:w-0 after:h-0.5 after:bg-green-600
+                            after:transition-all after:duration-300
+                            hover:after:w-full"
+                    >
+                    Se connecter
+                    </a>
+
+                    <!-- Afficher Déconnexion si connecté -->
+                    <button
+                    v-if="isAuthenticated"
+                    @click="handleLogout"
+                    class="relative text-gray-700 transition-colors duration-300
+                            hover:text-green-600
+                            after:content-[''] after:absolute after:left-0 after:-bottom-1
+                            after:w-0 after:h-0.5 after:bg-green-600
+                            after:transition-all after:duration-300
+                            hover:after:w-full"
+                    >
+                    Déconnexion
+                    </button>
                 </div>
             </div>
         </nav>
@@ -42,3 +71,16 @@
         <slot />
     </div>
 </template>
+
+<script setup lang="ts">
+import AuthService from '~/services/api/authApi'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const { isAuthenticated } = useAuth()
+
+const handleLogout = async () => {
+    await router.push('/')
+    await AuthService.logout()
+}
+</script>

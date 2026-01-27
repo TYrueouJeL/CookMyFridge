@@ -17,8 +17,9 @@
 
           <div>
             <RouterLink
+          v-if="isAuthenticated"
             :to="`/recettes/${recipe.id}/ingredients/add`"
-            class="border border-gray-400 hover:bg-gray-200 rounded-lg m-1 px-3 py-2 flex items-center justify-center text-center  h-min"
+            class="border border-gray-400 hover:bg-gray-200 rounded-lg m-1 px-3 py-2 flex items-center justify-center text-center h-min"
             >
               Ajouter un ingredient
             </RouterLink>
@@ -41,6 +42,9 @@
 <script setup>
 import { useRoute } from 'vue-router'
 import RecipeService from '~/services/api/recipeApi'
+import { useAuth } from '../../../composables/useAuth';
+
+const { isAuthenticated } = useAuth()
 
 const route = useRoute()
 
