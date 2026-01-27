@@ -3,11 +3,9 @@
         <h1 class="text-3xl font-bold mb-4 text-center">Création d'une recette</h1>
 
         <AsyncState :loading="loading" :error="error">
-            <p class="text-lg font-bold">Formulaire :</p>
-            
             <form
                 @submit.prevent="submit"
-                class="border rounded-lg border-gray-300 p-6 space-y-6"
+                class="border rounded-lg border-gray-300 p-6 space-y-6 mx-80"
             >
                 <div>
                     <label class="block font-semibold mb-1">Nom de la recette</label>

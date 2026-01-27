@@ -15,7 +15,14 @@
             <p>{{ recipe.description }}</p>
           </div>
 
-          <div class="grid grid-cols-3 gap-4 border rounded-lg border-green-300 p-2 col-span-3 m-1">
+          <RouterLink
+          :to="`/recettes/${recipe.id}/ingredients/add`"
+          class="border border-gray-400 hover:bg-gray-200 rounded-lg m-1 px-3 py-2 flex items-center justify-center text-center  h-min"
+          >
+            Ajouter un ingredient
+          </RouterLink>
+
+          <div class="grid grid-cols-2 gap-4 border rounded-lg border-green-300 p-2 col-span-2 m-1">
             <p class="text-lg font-bold col-span-3">Ingrédients</p>
             <div class="border rounded-lg border-green-300 p-2 h-min" v-for="ingredient in recipe.ingredients">
               <p>{{ ingredient.name }}</p>

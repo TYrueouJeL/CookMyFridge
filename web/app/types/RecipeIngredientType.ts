@@ -4,3 +4,14 @@ export interface RecipeIngredientType {
     quantity: number
     unit: UnitEnum
 }
+
+export interface CreateRecipeIngredientDTO {
+    ingredientId: number
+    quantity: number
+    unit: UnitEnum
+}
+
+export interface UpdateRecipeIngredientDTO {
+    quantity?: number
+    unit?: UnitEnum
+}
