@@ -1,8 +1,11 @@
+import Recipe from "#models/recipe"
+
 export interface UserDTO {
     id: number
     fullName: string | null
     email: string
     password: string
+    recipes: Recipe[]
 }
 
 export interface CreateUserDTO {

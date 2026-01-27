@@ -10,6 +10,7 @@ export default class extends BaseSchema {
       table
         .integer('recipe_id')
         .unsigned()
+        .notNullable()
         .references('id')
         .inTable('recipes')
         .onDelete('CASCADE')
@@ -17,6 +18,7 @@ export default class extends BaseSchema {
       table
         .integer('ingredient_id')
         .unsigned()
+        .notNullable()
         .references('id')
         .inTable('ingredients')
         .onDelete('CASCADE')

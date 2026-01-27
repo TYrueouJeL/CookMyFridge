@@ -4,12 +4,17 @@ import { CreateRecipeIngredientDTO, RecipeIngredientDTO, UpdateRecipeIngredientD
 
 export default class RecipeService {
     public async list() {
-        const recipes = await Recipe.query()
+        const recipes = await Recipe.query().preload('user')
 
         return recipes.map((recipe) => ({
             id: recipe.id,
             name: recipe.name,
-            description: recipe.description
+            description: recipe.description,
+            user: {
+                id: recipe.user.id,
+                fullName: recipe.user.fullName,
+                email: recipe.user.email
+            }
         }))
     }
 
@@ -20,12 +25,18 @@ export default class RecipeService {
             .preload('ingredients', (query) => {
                 query.pivotColumns(['quantity', 'unit'])
             })
+            .preload('user')
             .firstOrFail()
         
         return {
             id: recipe.id,
             name: recipe.name,
             description: recipe.description,
+            user: {
+                id: recipe.user.id,
+                fullName: recipe.user.fullName,
+                email: recipe.user.email
+            },
             ingredients: recipe.ingredients.map((ingredient) => ({
                 id: ingredient.id,
                 name: ingredient.name,

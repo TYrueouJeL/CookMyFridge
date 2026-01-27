@@ -1,4 +1,5 @@
 import Ingredient from "#models/ingredient";
+import User from "#models/user";
 import testUtils from "@adonisjs/core/services/test_utils";
 import { test } from "@japa/runner";
 
@@ -6,12 +7,14 @@ test.group('Ingredient controller', (group) => {
     group.each.setup(() => testUtils.db().withGlobalTransaction())
 
     test('GET /ingredients', async ({ client, assert }) => {
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const token = await User.accessTokens.create(user)
         await Ingredient.createMany([
             { name: 'Tomato' },
             { name: 'Potato'}
         ])
 
-        const response = await client.get('/ingredients').send()
+        const response = await client.get('/ingredients').bearerToken(token.value!.release()).send()
 
         assert.equal(response.status(), 200)
         assert.lengthOf(response.body(), 2)
@@ -19,7 +22,9 @@ test.group('Ingredient controller', (group) => {
     })
 
     test('POST /ingredients', async ({ client, assert }) => {
-        const response = await client.post('/ingredients').json({
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const token = await User.accessTokens.create(user)
+        const response = await client.post('/ingredients').bearerToken(token.value!.release()).json({
             name: 'Tomato'
         })
 
@@ -34,9 +39,11 @@ test.group('Ingredient controller', (group) => {
     })
 
     test('GET /ingredients/:ingredientId', async ({ client, assert }) => {
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const token = await User.accessTokens.create(user)
         const ingredient = await Ingredient.create({ name: 'Pizza' })
     
-        const response = await client.get(`/ingredients/${ingredient.id}`)
+        const response = await client.get(`/ingredients/${ingredient.id}`).bearerToken(token.value!.release())
     
         assert.equal(response.status(), 200)
         assert.equal(response.body().id, ingredient.id)
@@ -44,9 +51,11 @@ test.group('Ingredient controller', (group) => {
     })
 
     test('PUT /ingredients/:ingredientId', async ({ client, assert }) => {
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const token = await User.accessTokens.create(user)
         const ingredient = await Ingredient.create({ name: 'Pizza' })
 
-        const response = await client.put(`/ingredients/${ingredient.id}`).json({
+        const response = await client.put(`/ingredients/${ingredient.id}`).bearerToken(token.value!.release()).json({
             name: 'Burger'
         })
 
@@ -60,9 +69,11 @@ test.group('Ingredient controller', (group) => {
     })
 
     test('DELETE /ingredients/:ingredientId', async ({ client, assert }) => {
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const token = await User.accessTokens.create(user)
         const ingredient = await Ingredient.create({ name: 'Pizza' })
 
-        const response = await client.delete(`/ingredients/${ingredient.id}`)
+        const response = await client.delete(`/ingredients/${ingredient.id}`).bearerToken(token.value!.release())
 
         assert.equal(response.status(), 204)
 

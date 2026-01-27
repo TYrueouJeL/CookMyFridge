@@ -1,5 +1,6 @@
 import Ingredient from '#models/ingredient'
 import Recipe from '#models/recipe'
+import User from '#models/user'
 import testUtils from '@adonisjs/core/services/test_utils'
 import { test } from '@japa/runner'
 
@@ -7,20 +8,25 @@ test.group('Recipes controller', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())
 
   test('GET /recipes', async ({ client, assert }) => {
+    const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
     await Recipe.createMany([
-      { name: 'Pizza', description: 'This is a Pizza' },
-      { name: 'Burger', description: 'This is a Burger' }
+      { name: 'Pizza', description: 'This is a Pizza', userId: user.id },
+      { name: 'Burger', description: 'This is a Burger', userId: user.id }
     ])
 
     const response = await client.get('/recipes').send()
 
     assert.equal(response.status(), 200)
     assert.lengthOf(response.body(), 2)
-    assert.deepInclude(response.body()[0], { name: 'Pizza', description: 'This is a Pizza' })
+    assert.equal(response.body()[0].name, 'Pizza')
+    assert.equal(response.body()[0].description, 'This is a Pizza')
+    assert.equal(response.body()[0].user.id, user.id)
   })
 
   test('POST /recipes', async ({ client, assert }) => {
-    const response = await client.post('/recipes').json({
+    const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+    const token = await User.accessTokens.create(user)
+    const response = await client.post('/recipes').bearerToken(token.value!.release()).json({
       name: 'Pizza',
       description: 'This is a Pizza'
     })
@@ -34,10 +40,12 @@ test.group('Recipes controller', (group) => {
     assert.exists(recipeInDb)
     assert.equal(recipeInDb!.name, 'Pizza')
     assert.equal(recipeInDb!.description, 'This is a Pizza')
+    assert.equal(recipeInDb!.userId, user.id)
   })
 
   test('GET /recipes/:recipeId', async ({ client, assert }) => {
-    const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a Pizza' })
+    const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+    const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a Pizza', userId: user.id })
 
     const ingredients = await Ingredient.createMany([
       { name: 'Potato flour' },
@@ -55,6 +63,7 @@ test.group('Recipes controller', (group) => {
     assert.equal(response.body().id, recipe.id)
     assert.equal(response.body().name, recipe.name)
     assert.equal(response.body().description, 'This is a Pizza')
+    assert.equal(response.body().user.id, user.id)
     assert.lengthOf(response.body().ingredients, 2)
 
     assert.deepInclude(response.body().ingredients, {
@@ -73,9 +82,11 @@ test.group('Recipes controller', (group) => {
   })
 
   test('PUT /recipes/:recipeId', async ({ client, assert }) => {
-    const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a Pizza' })
+    const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+    const token = await User.accessTokens.create(user)
+    const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a Pizza', userId: user.id })
 
-    const response = await client.put(`/recipes/${recipe.id}`).json({
+    const response = await client.put(`/recipes/${recipe.id}`).bearerToken(token.value!.release()).json({
       name: 'Burger',
       description: 'This is a Burger'
     })
@@ -89,12 +100,15 @@ test.group('Recipes controller', (group) => {
     assert.exists(recipeInDb)
     assert.equal(recipeInDb!.name, 'Burger')
     assert.equal(recipeInDb!.description, 'This is a Burger')
+    assert.equal(recipeInDb!.userId, user.id)
   })
 
   test('DELETE /recipes/:recipeId', async ({ client, assert }) => {
-    const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a Pizza' })
+    const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+    const token = await User.accessTokens.create(user)
+    const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a Pizza', userId: user.id })
 
-    const response = await client.delete(`/recipes/${recipe.id}`)
+    const response = await client.delete(`/recipes/${recipe.id}`).bearerToken(token.value!.release())
 
     assert.equal(response.status(), 204)
 

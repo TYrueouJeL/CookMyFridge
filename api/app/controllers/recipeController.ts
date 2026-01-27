@@ -24,14 +24,17 @@ export default class RecipeController {
         return response.ok(recipe)
     }
 
-    public async store({ request, response }: HttpContext) {
-        const payload: CreateRecipeDTO = await request.validateUsing(createRecipeValidator)
-        const recipe =  await this.recipeService.create(payload)
+    public async store({ request, response, auth }: HttpContext) {
+        const payload = await request.validateUsing(createRecipeValidator)
+        const user = await auth.authenticate()
+        const recipePayload: CreateRecipeDTO = { ...payload, userId: user.id }
+        const recipe =  await this.recipeService.create(recipePayload)
         return response.created(recipe)
     }
 
-    public async update({ params, request, response }: HttpContext) {
+    public async update({ params, request, response, auth }: HttpContext) {
         const recipeId = params.recipeId
+        const user = await auth.authenticate()
         const payload: UpdateRecipeDTO = await request.validateUsing(updateRecipeValidator)
 
         const updatedRecipe = await this.recipeService.update(recipeId, payload)
@@ -39,13 +42,27 @@ export default class RecipeController {
             return response.notFound({ message: 'Recipe not found' })
         }
 
+        if (updatedRecipe.userId !== user.id) {
+            return response.forbidden({ message: 'You are not allowed to update this recipe' })
+        }
+
         return response.ok(updatedRecipe)
     }
 
-    public async delete({ params, response }: HttpContext) {
+    public async delete({ params, response, auth }: HttpContext) {
         const recipeId = params.recipeId
-        const deleted = await this.recipeService.delete(recipeId)
+        const user = await auth.authenticate()
+        const recipe = await this.recipeService.findById(recipeId)
 
+        if (!recipe) {
+            return response.notFound({ message: 'Recipe not found' })
+        }
+
+        if (recipe.user?.id !== user.id) {
+            return response.forbidden({ message: 'You are not allowed to delete this recipe' })
+        }
+
+        const deleted = await this.recipeService.delete(recipeId)
         if (!deleted) {
             return response.notFound({ message: 'Recipe not found ' })
         }

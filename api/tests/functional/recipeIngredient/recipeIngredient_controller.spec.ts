@@ -1,5 +1,6 @@
 import Ingredient from "#models/ingredient";
 import Recipe from "#models/recipe";
+import User from "#models/user";
 import testUtils from "@adonisjs/core/services/test_utils";
 import { test } from "@japa/runner";
 
@@ -7,7 +8,9 @@ test.group('RecipeIngredient controller', (group) => {
     group.each.setup(() => testUtils.db().withGlobalTransaction())
 
     test('GET /recipes/:recipeId/ingredients', async ({ client, assert }) => {
-        const recipe = await Recipe.create({ name: 'Pizza' })
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const token = await User.accessTokens.create(user)
+        const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a pizza', userId: user.id })
         const ingredients = await Ingredient.createMany([
             { name: 'Tomato' },
             { name: 'Potato' }
@@ -24,7 +27,7 @@ test.group('RecipeIngredient controller', (group) => {
             }
         })
 
-        const response = await client.get(`/recipes/${recipe.id}/ingredients`).send()
+        const response = await client.get(`/recipes/${recipe.id}/ingredients`).bearerToken(token.value!.release()).send()
 
         assert.equal(response.status(), 200)
         assert.lengthOf(response.body(), 2)
@@ -32,13 +35,15 @@ test.group('RecipeIngredient controller', (group) => {
     })
 
     test('POST /recipes/:recipeId/ingredients', async ({ client, assert }) => {
-        const recipe = await Recipe.create({ name: 'Pizza' })
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const token = await User.accessTokens.create(user)
+        const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a pizza', userId: user.id })
         const ingredients = await Ingredient.createMany([
             { name: 'Tomato' },
             { name: 'Potato' }
         ])
 
-        const response = await client.post(`/recipes/${recipe.id}/ingredients`).json({
+        const response = await client.post(`/recipes/${recipe.id}/ingredients`).bearerToken(token.value!.release()).json({
             ingredientId: ingredients[0].id,
             quantity: 4,
             unit: 'piece'
@@ -51,7 +56,9 @@ test.group('RecipeIngredient controller', (group) => {
     })
 
     test('GET /recipes/:recipeId/ingredients/:ingredientId', async ({ client, assert }) => {
-        const recipe = await Recipe.create({ name: 'Pizza' })
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const token = await User.accessTokens.create(user)
+        const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a pizza', userId: user.id })
         const ingredients = await Ingredient.createMany([
             { name: 'Tomato' },
             { name: 'Potato' }
@@ -68,7 +75,7 @@ test.group('RecipeIngredient controller', (group) => {
             }
         })
 
-        const response = await client.get(`/recipes/${recipe.id}/ingredients/${ingredients[0].id}`)
+        const response = await client.get(`/recipes/${recipe.id}/ingredients/${ingredients[0].id}`).bearerToken(token.value!.release())
 
         assert.equal(response.status(), 200)
         assert.equal(response.body().id, ingredients[0].id)
@@ -77,7 +84,9 @@ test.group('RecipeIngredient controller', (group) => {
     })
 
     test('PUT /recipes/:recipeId/ingredients/:ingredientId', async ({ client, assert }) => {
-        const recipe = await Recipe.create({ name: 'Pizza' })
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const token = await User.accessTokens.create(user)
+        const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a pizza', userId: user.id })
         const ingredients = await Ingredient.createMany([
             { name: 'Tomato' },
             { name: 'Potato' }
@@ -94,7 +103,7 @@ test.group('RecipeIngredient controller', (group) => {
             }
         })
 
-        const response = await client.put(`/recipes/${recipe.id}/ingredients/${ingredients[0].id}`).json({
+        const response = await client.put(`/recipes/${recipe.id}/ingredients/${ingredients[0].id}`).bearerToken(token.value!.release()).json({
             ingredientId: ingredients[0].id,
             quantity: 5,
             unit: 'kg'
@@ -107,7 +116,9 @@ test.group('RecipeIngredient controller', (group) => {
     })
 
     test('DELETE /recipes/:recipeId/ingredients/:ingredientId', async ({ client, assert }) => {
-        const recipe = await Recipe.create({ name: 'Pizza' })
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const token = await User.accessTokens.create(user)
+        const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a pizza', userId: user.id })
         const ingredients = await Ingredient.createMany([
             { name: 'Tomato' },
             { name: 'Potato' }
@@ -124,7 +135,7 @@ test.group('RecipeIngredient controller', (group) => {
             }
         })
 
-        const response = await client.delete(`/recipes/${recipe.id}/ingredients/${ingredients[0].id}`)
+        const response = await client.delete(`/recipes/${recipe.id}/ingredients/${ingredients[0].id}`).bearerToken(token.value!.release())
 
         assert.equal(response.status(), 204)
 

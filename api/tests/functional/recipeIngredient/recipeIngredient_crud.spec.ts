@@ -1,5 +1,6 @@
 import Ingredient from "#models/ingredient";
 import Recipe from "#models/recipe";
+import User from "#models/user";
 import testUtils from "@adonisjs/core/services/test_utils";
 import { test } from "@japa/runner";
 
@@ -7,7 +8,8 @@ test.group('RecipeIngredient CRUD', (group) => {
     group.each.setup(() => testUtils.db().withGlobalTransaction())
 
     test('CREATE : créer un ingrédient pour une recette', async ({ assert }) => {
-        const recipe = await Recipe.create({ name: 'Pizza' })
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a pizza', userId: user.id })
         const ingredient = await Ingredient.create({ name: 'Tomato' })
         
         await recipe.related('ingredients').attach({
@@ -36,7 +38,8 @@ test.group('RecipeIngredient CRUD', (group) => {
     })
 
     test('READ : lire un ingrédient pour un recette', async ({ assert }) => {
-        const recipe = await Recipe.create({ name: 'Pizza' })
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a pizza', userId: user.id })
         const ingredient = await Ingredient.create({ name: 'Tomato' })
 
         await recipe.related('ingredients').attach({
@@ -65,7 +68,8 @@ test.group('RecipeIngredient CRUD', (group) => {
     })
 
     test('UPDATE : modifier un ingrédient d\'une recette', async ({ assert }) => {
-        const recipe = await Recipe.create({ name: 'Pizza' })
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a pizza', userId: user.id })
         const ingredient = await Ingredient.create({ name: 'Tomato' })
 
         await recipe.related('ingredients').attach({
@@ -96,7 +100,8 @@ test.group('RecipeIngredient CRUD', (group) => {
     })
 
     test('DELETE : supprimer un ingrédient d\'une recette', async ({ assert }) => {
-        const recipe = await Recipe.create({ name: 'Pizza' })
+        const user = await User.create({ fullName: 'User', email: 'user@gmail.com', password: 'PAssword123*' })
+        const recipe = await Recipe.create({ name: 'Pizza', description: 'This is a pizza', userId: user.id })
         const ingredient = await Ingredient.create({ name: 'Tomato' })
 
         await recipe.related('ingredients').attach({
