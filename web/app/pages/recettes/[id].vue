@@ -31,12 +31,13 @@
 
 <script setup>
 import { useRoute } from 'vue-router'
+import RecipeService from '~/services/api/recipeApi'
 
 const route = useRoute()
 
-const { data: recipe, pending, error } = await useAsyncData(
+const { data: recipe, pending: loading, error } = await useAsyncData(
   () => `recipe-${route.params.id}`,
-  () => $fetch(`http://localhost:3333/recipes/${route.params.id}`)
+  () => RecipeService.getById(Number(route.params.id))
 )
 
 useHead(() => ({

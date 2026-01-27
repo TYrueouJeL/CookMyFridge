@@ -35,6 +35,7 @@
 import { ref, onMounted, computed } from 'vue'
 import RecipeCard from '../../components/RecipeCard.vue'
 import AsyncState from '~/components/AsyncState.vue'
+import RecipeService from '~/services/api/recipeApi'
 
 const recipes = ref([])
 const loading = ref(true)
@@ -46,9 +47,7 @@ const fetchRecipes = async () => {
   error.value = null
 
   try {
-    const res = await fetch('http://localhost:3333/recipes/')
-    if (!res.ok) throw new Error('Erreur lors de la récupération des recettes')
-    const data = await res.json()
+    const data = await RecipeService.getAll()
     recipes.value = data
   } catch (err) {
     error.value = err.message
