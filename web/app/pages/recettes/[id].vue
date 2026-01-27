@@ -6,14 +6,18 @@
       <div v-if="recipe" class="text-center">
         <h2 class="text-2xl font-semibold mb-4">{{ recipe.name }}</h2>
         <div class="grid grid-cols-3">
-          <div class="border border-gray-300 rounded-lg col-span-2 mx-2 h-min p-2">
+          <div class="col-span-2 row-span-2 m-1">
+            <img src="https://foodish-api.com/images/pasta/pasta33.jpg" class="rounded-lg"/>
+          </div>
+          
+          <div class="border border-gray-300 rounded-lg m-1 p-2 row-span-2">
             <p class="text-lg font-bold">Description : </p>
             <p>{{ recipe.description }}</p>
           </div>
-          
-          <div class="grid grid-cols-2 gap-4 mx-2 border rounded-lg border-green-300 p-2">
-            <p class="text-lg font-bold col-span-2">Ingrédients</p>
-            <div class="border rounded-lg border-green-300 hover:bg-green-100 hover:-translate-0.5 transition duration 300 hover:shadow-lg shadow-lg p-2 h-min" v-for="ingredient in recipe.ingredients">
+
+          <div class="grid grid-cols-3 gap-4 border rounded-lg border-green-300 p-2 col-span-3 m-1">
+            <p class="text-lg font-bold col-span-3">Ingrédients</p>
+            <div class="border rounded-lg border-green-300 p-2 h-min" v-for="ingredient in recipe.ingredients">
               <p>{{ ingredient.name }}</p>
               <p>Quantitée : {{ ingredient.quantity }}{{ ingredient.unit }}</p>
             </div>
