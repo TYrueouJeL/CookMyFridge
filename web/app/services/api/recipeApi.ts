@@ -22,6 +22,20 @@ export default class RecipeService {
         return response.json()
     }
 
+    static async count() {
+        const response = await fetch(`${apiUrl}recipes/count`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+    
+        if (!response.ok) {
+            const body = await response.json()
+            throw new Error(body.message ?? 'Erreur API')
+        }
+    
+        return response.json()
+    }
+
     static async getById(id: number) {
         const response = await fetch(`${apiUrl}recipes/${id}`, {
             method: 'GET',

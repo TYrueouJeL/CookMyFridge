@@ -25,6 +25,7 @@ router.get('/me', [AuthController, 'me']).use(middleware.auth({ guards: ['api'] 
 
 router.group(() => {
   router.get('/', [RecipeController, 'index'])
+  router.get('/count', [RecipeController, 'count'])
   router.post('/', [RecipeController, 'store']).use(middleware.auth({ guards: ['api'] }))
   router.get('/:recipeId', [RecipeController, 'show'])
   router.put('/:recipeId', [RecipeController, 'update']).use(middleware.auth({ guards: ['api'] }))
@@ -43,6 +44,7 @@ router.group(() => {
 
 router.group(() => {
   router.get('/', [IngredientController, 'index'])
+  router.get('/count', [IngredientController, 'count'])
   router.post('/', [IngredientController, 'store'])
   router.get('/:ingredientId', [IngredientController, 'show'])
   router.put('/:ingredientId', [IngredientController, 'update'])

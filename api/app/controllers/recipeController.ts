@@ -16,6 +16,11 @@ export default class RecipeController {
         return response.ok(result)
     }
 
+    public async count({ response }: HttpContext) {
+        const count = await this.recipeService.count()
+        return response.ok({ count })
+    }
+
     public async show({ params, response }: HttpContext) {
         const recipeId = params.recipeId
         const recipe = await this.recipeService.findById(recipeId)

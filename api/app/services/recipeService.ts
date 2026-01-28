@@ -40,6 +40,11 @@ export default class RecipeService {
         }
     }
 
+    public async count() {
+        const result = await Recipe.query().count('* as count')
+        return result[0].$extras.count
+    }
+
     public async findById(id: number) {
         const recipe = await Recipe
             .query()

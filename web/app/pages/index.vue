@@ -59,7 +59,7 @@
       <div class="mt-16 relative" data-aos="zoom-in" data-aos-delay="400">
         <div class="absolute inset-0 bg-linear-to-r from-green-200 to-emerald-200 rounded-3xl blur-3xl opacity-30 transform -rotate-2"></div>
         <div class="relative bg-white rounded-3xl shadow-2xl p-8 max-w-4xl mx-auto border border-green-100">
-          <div class="flex items-center justify-center gap-6 flex-wrap">
+          <div class="flex items-center justify-center gap-6 flex-wrap select-none">
             <div class="text-6xl" data-aos="flip-left" data-aos-delay="500">🥗</div>
             <div class="text-6xl" data-aos="flip-left" data-aos-delay="600">🍕</div>
             <div class="text-6xl" data-aos="flip-left" data-aos-delay="700">🍜</div>
@@ -239,11 +239,11 @@
     <section class="container mx-auto px-6 py-12 mb-12">
       <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
         <div data-aos="fade-up" data-aos-delay="100">
-          <div class="text-4xl font-bold text-green-600 mb-2">500+</div>
+          <div class="text-4xl font-bold text-green-600 mb-2">{{ stats.recipes }}</div>
           <div class="text-gray-600">Recettes</div>
         </div>
         <div data-aos="fade-up" data-aos-delay="200">
-          <div class="text-4xl font-bold text-green-600 mb-2">1000+</div>
+          <div class="text-4xl font-bold text-green-600 mb-2">{{ stats.ingredients }}</div>
           <div class="text-gray-600">Ingrédients</div>
         </div>
         <div data-aos="fade-up" data-aos-delay="300">
@@ -260,7 +260,32 @@
 </template>
 
 <script setup lang="ts">
+import RecipeService from '~/services/api/recipeApi'
+import IngredientService from '~/services/api/ingredientApi'
+
 const { isAuthenticated } = useAuth()
+
+const stats = ref({
+  recipes: 0,
+  ingredients: 0
+})
+
+// Charger les statistiques
+const { pending } = await useAsyncData('stats', async () => {
+  try {
+    const [recipeData, ingredientData] = await Promise.all([
+      RecipeService.count(),
+      IngredientService.count()
+    ])
+    
+    stats.value = {
+      recipes: recipeData.count,
+      ingredients: ingredientData.count
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des statistiques:', error)
+  }
+})
 
 useHead(() => ({
   title: 'CookMyFridge - Transformez votre frigo en délicieuses recettes',

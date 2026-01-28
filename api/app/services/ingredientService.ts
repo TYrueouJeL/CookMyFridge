@@ -13,6 +13,11 @@ export default class IngredientService {
         }))
     }
 
+    public async count() {
+        const result = await Ingredient.query().count('* as count')
+        return result[0].$extras.count
+    }
+
     public async findById(id: number) {
         const ingredient = await Ingredient
             .query()

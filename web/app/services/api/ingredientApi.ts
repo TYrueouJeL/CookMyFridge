@@ -17,6 +17,20 @@ export default class IngredientService {
         return response.json()
     }
 
+    static async count() {
+        const response = await fetch(`${apiUrl}ingredients/count`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+
+        if (!response.ok) {
+            const body = await response.json()
+            throw new Error(body.message ?? 'Erreur API')
+        }
+
+        return response.json()
+    }
+
     static async getById(ingredientId: number) {
         const response = await fetch(`${apiUrl}ingredients/${ingredientId}`, {
             method: 'GET',
