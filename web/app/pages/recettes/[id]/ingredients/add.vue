@@ -77,6 +77,7 @@
 import { UnitEnum } from '~/enum/UnitEnum'
 import IngredientService from '~/services/api/ingredientApi'
 import RecipeService from '~/services/api/recipeApi'
+import AuthService from '~/services/api/authApi'
 import type { IngredientType } from '~/types/IngredientType'
 
 definePageMeta({
@@ -111,10 +112,21 @@ const availableIngredients = computed(() => {
 
 onMounted(async () => {
     try {
-        const [allIngredients, currentRecipeIngredients] = await Promise.all([
+        const [allIngredients, currentRecipeIngredients, recipe, currentUser] = await Promise.all([
             IngredientService.getAll(),
-            RecipeService.getIngredients(Number(route.params.id))
+            RecipeService.getIngredients(Number(route.params.id)),
+            RecipeService.getById(Number(route.params.id)),
+            AuthService.getMe().then(data => data.user)
         ])
+        
+        // Vérifier que l'utilisateur est bien le propriétaire de la recette
+        if (recipe.userId !== currentUser.id) {
+            error.value = 'Vous n\'êtes pas autorisé à modifier cette recette'
+            setTimeout(() => {
+                router.push(`/recettes/${route.params.id}`)
+            }, 2000)
+            return
+        }
         
         ingredients.value = allIngredients
         recipeIngredients.value = currentRecipeIngredients
