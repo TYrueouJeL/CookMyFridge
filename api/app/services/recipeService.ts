@@ -3,10 +3,14 @@ import { CreateRecipeDTO, UpdateRecipeDTO } from "../dto/recipeDTO.js";
 import { CreateRecipeIngredientDTO, RecipeIngredientDTO, UpdateRecipeIngredientDTO } from "../dto/recipeIngredientDTO.js";
 
 export default class RecipeService {
-    public async list() {
-        const recipes = await Recipe.query().preload('user')
+    public async list(page: number = 1, limit: number = 10) {
+        const offset = (page - 1) * limit
+        const query = Recipe.query().preload('user')
+        
+        const recipes = await query.offset(offset).limit(limit)
+        const total = await Recipe.query().count('* as count').then(result => result[0].$extras.count)
 
-        return recipes.map((recipe) => ({
+        const data = recipes.map((recipe) => ({
             id: recipe.id,
             name: recipe.name,
             description: recipe.description,
@@ -18,6 +22,13 @@ export default class RecipeService {
             createdAt: recipe.createdAt.toISO(),
             updatedAt: recipe.updatedAt.toISO()
         }))
+
+        return {
+            total,
+            page,
+            limit,
+            data
+        }
     }
 
     public async findById(id: number) {

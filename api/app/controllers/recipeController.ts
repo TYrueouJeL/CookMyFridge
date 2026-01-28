@@ -2,15 +2,17 @@ import RecipeService from '#services/recipeService';
 import { createRecipeIngredientValidator, updateRecipeIngredientValidator } from '#validators/recipeIngredientValidator';
 import { createRecipeValidator, updateRecipeValidator } from '#validators/recipeValidators';
 import { HttpContext } from '@adonisjs/core/http';
-import { CreateRecipeDTO, RecipeDTO, UpdateRecipeDTO } from '../dto/recipeDTO.js';
+import { CreateRecipeDTO, UpdateRecipeDTO } from '../dto/recipeDTO.js';
 import { CreateRecipeIngredientDTO, RecipeIngredientDTO, UpdateRecipeIngredientDTO } from '../dto/recipeIngredientDTO.js';
 
 export default class RecipeController {
     private recipeService = new RecipeService()
 
-    public async index({ response }: HttpContext) {
-        const recipes: RecipeDTO[] = await this.recipeService.list()
-        return response.ok(recipes)
+    public async index({ request, response }: HttpContext) {
+        const page = request.input('page', 1)
+        const limit = request.input('limit', 10)
+        const result = await this.recipeService.list(page, limit)
+        return response.ok(result)
     }
 
     public async show({ params, response }: HttpContext) {

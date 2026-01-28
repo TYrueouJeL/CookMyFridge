@@ -16,14 +16,17 @@ test.group('Recipes service', (group) => {
         ])
 
         const service = new RecipeService()
-        const recipes = await service.list()
+        const result = await service.list()
 
-        assert.lengthOf(recipes, 2)
-        assert.equal(recipes[0].name, 'Pizza')
-        assert.equal(recipes[0].description, 'This is a pizza')
-        assert.equal(recipes[0].user.id, user.id)
-        assert.equal(recipes[0].user.fullName, 'User')
-        assert.equal(recipes[0].user.email, 'user@gmail.com')
+        assert.equal(result.total, 2)
+        assert.equal(result.page, 1)
+        assert.equal(result.limit, 10)
+        assert.lengthOf(result.data, 2)
+        assert.equal(result.data[0].name, 'Pizza')
+        assert.equal(result.data[0].description, 'This is a pizza')
+        assert.equal(result.data[0].user.id, user.id)
+        assert.equal(result.data[0].user.fullName, 'User')
+        assert.equal(result.data[0].user.email, 'user@gmail.com')
     })
 
     test('RecipeService.findById retourne une recette avec ses ingrédients', async ({ assert }) => {

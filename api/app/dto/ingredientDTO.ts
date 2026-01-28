@@ -9,6 +9,6 @@ export interface UpdateIngredientDTO {
 export interface ingredientDTO {
     id: number
     name: string
-    createdAt: string
-    updatedAt: string
+    createdAt: string | null
+    updatedAt: string | null
 }
