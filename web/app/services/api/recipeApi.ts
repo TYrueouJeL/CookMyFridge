@@ -79,6 +79,11 @@ export default class RecipeService {
             throw new Error(body.message ?? 'Erreur API')
         }
     
+        // 204 No Content n'a pas de body
+        if (response.status === 204) {
+            return null
+        }
+    
         return response.json()
     }
 
