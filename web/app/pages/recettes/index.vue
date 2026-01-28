@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import RecipeCard from '../../components/RecipeCard.vue'
 import AsyncState from '~/components/AsyncState.vue'
 import RecipeService from '~/services/api/recipeApi'
@@ -61,6 +61,7 @@ const searchQuery = ref('')
 const currentPage = ref(1)
 const totalRecipes = ref(0)
 const limit = 9
+let searchTimeout = null
 
 const fetchRecipes = async (page = 1) => {
   if (page === 1) {
@@ -71,7 +72,7 @@ const fetchRecipes = async (page = 1) => {
   error.value = null
 
   try {
-    const data = await RecipeService.getAll(page, limit)
+    const data = await RecipeService.getAll(page, limit, searchQuery.value)
     
     if (page === 1) {
       recipes.value = data.data
@@ -97,19 +98,21 @@ const hasMore = computed(() => {
 })
 
 const filteredRecipes = computed(() => {
-  if (!searchQuery.value.trim()) {
-    return recipes.value
-  }
-  
-  const query = searchQuery.value.toLowerCase()
-  return recipes.value.filter(recipe => 
-    recipe.name.toLowerCase().includes(query)
-  )
+  return recipes.value
 })
 
 const loadMore = () => {
   fetchRecipes(currentPage.value + 1)
 }
+
+// Recherche avec debounce
+watch(searchQuery, () => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    currentPage.value = 1
+    fetchRecipes(1)
+  }, 500)
+})
 
 onMounted(() => {
   fetchRecipes(1)

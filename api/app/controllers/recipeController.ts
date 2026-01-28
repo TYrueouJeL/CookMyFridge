@@ -11,7 +11,8 @@ export default class RecipeController {
     public async index({ request, response }: HttpContext) {
         const page = request.input('page', 1)
         const limit = request.input('limit', 10)
-        const result = await this.recipeService.list(page, limit)
+        const search = request.input('search', '')
+        const result = await this.recipeService.list(page, limit, search)
         return response.ok(result)
     }
 
