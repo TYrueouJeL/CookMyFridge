@@ -19,13 +19,29 @@
     </div>
 
     <AsyncState :loading="loading" :error="error">
-      <div class="columns-1 md:columns-2 lg:columns-3 gap-6 justify-items-center p-2 mx-80">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center p-2 mx-80">
         <RecipeCard
           v-for="recipe in filteredRecipes"
           :key="recipe.id"
           :recipe="recipe"
           class="mb-6 break-inside-avoid"
         />
+      </div>
+
+      <!-- Bouton "Charger plus" -->
+      <div v-if="hasMore" class="flex justify-center mt-8">
+        <button
+          @click="loadMore"
+          :disabled="loadingMore"
+          class="border border-green-400 bg-green-100 hover:bg-green-300 disabled:opacity-50 rounded-lg p-2 px-6"
+        >
+          {{ loadingMore ? 'Chargement...' : 'Charger plus' }}
+        </button>
+      </div>
+
+      <!-- Message quand tout est chargé -->
+      <div v-if="!hasMore && recipes.length > 0" class="text-center mt-8 text-gray-500">
+        Toutes les recettes ont été chargées ({{ totalRecipes }} au total)
       </div>
     </AsyncState>
   </div>
@@ -39,22 +55,46 @@ import RecipeService from '~/services/api/recipeApi'
 
 const recipes = ref([])
 const loading = ref(true)
+const loadingMore = ref(false)
 const error = ref(null)
 const searchQuery = ref('')
+const currentPage = ref(1)
+const totalRecipes = ref(0)
+const limit = 9
 
-const fetchRecipes = async () => {
-  loading.value = true
+const fetchRecipes = async (page = 1) => {
+  if (page === 1) {
+    loading.value = true
+  } else {
+    loadingMore.value = true
+  }
   error.value = null
 
   try {
-    const data = await RecipeService.getAll()
-    recipes.value = data
+    const data = await RecipeService.getAll(page, limit)
+    
+    if (page === 1) {
+      recipes.value = data.data
+    } else {
+      recipes.value.push(...data.data)
+    }
+    
+    totalRecipes.value = data.total
+    currentPage.value = page
   } catch (err) {
     error.value = err.message
   } finally {
-    loading.value = false
+    if (page === 1) {
+      loading.value = false
+    } else {
+      loadingMore.value = false
+    }
   }
 }
+
+const hasMore = computed(() => {
+  return recipes.value.length < totalRecipes.value
+})
 
 const filteredRecipes = computed(() => {
   if (!searchQuery.value.trim()) {
@@ -67,8 +107,12 @@ const filteredRecipes = computed(() => {
   )
 })
 
+const loadMore = () => {
+  fetchRecipes(currentPage.value + 1)
+}
+
 onMounted(() => {
-  fetchRecipes()
+  fetchRecipes(1)
 })
 
 useHead(() => ({

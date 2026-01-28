@@ -3,8 +3,8 @@ import type { CreateRecipeDTO, UpdateRecipeDTO } from "~/types/RecipeType";
 const apiUrl = import.meta.env.VITE_API_URL
 
 export default class RecipeService {
-    static async getAll() {
-        const response = await fetch(`${apiUrl}recipes`, {
+    static async getAll(page: number = 1, limit: number = 10) {
+        const response = await fetch(`${apiUrl}recipes?page=${page}&limit=${limit}`, {
             method: 'GET',
             credentials: 'include',
         })
