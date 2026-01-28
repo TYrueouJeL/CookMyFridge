@@ -15,24 +15,24 @@
             <p>{{ recipe.description }}</p>
           </div>
 
-          <div>
-            <div class="m-1">
-              <button
-              v-if="user?.id === recipe.userId"
-              @click="showDeleteModal = true"
-              class="border border-red-400 hover:bg-red-200 rounded-lg px-3 py-2 flex items-center justify-center text-center h-min w-full"
-              >
-                Supprimer la recette
-              </button>
-            </div>
-
-            <div class="border border-gray-400 rounded-lg m-1 mt-2 px-3 py-2 h-min">
-              <p class="font-semibold">Auteur : {{ recipe.user.fullName }}</p>
+          <div class="h-full flex flex-col justify-between">
+            <div class="border border-gray-400 rounded-lg m-1 px-3 py-2 h-full flex flex-col justify-center">
+              <p class="font-semibold">Auteur : {{ recipe.userId == user?.id ? 'Vous' : recipe.user.fullName }}</p>
               <p class="text-sm text-gray-600">Créée {{ formatRelativeTime(recipe.createdAt) }}</p>
               <p class="text-xs text-gray-500">{{ formatDate(recipe.createdAt) }}</p>
               <p v-if="recipe.updatedAt !== recipe.createdAt" class="text-xs text-gray-500">
                 Modifiée {{ formatRelativeTime(recipe.updatedAt) }}
               </p>
+            </div>
+
+            <div class="m-1">
+              <button
+              v-if="user?.id === recipe.userId"
+              @click="showDeleteModal = true"
+              class="border border-red-400 hover:bg-red-200 rounded-lg px-3 py-2 cursor-pointer flex items-center justify-center text-center h-min w-full"
+              >
+                Supprimer la recette
+              </button>
             </div>
           </div>
 
@@ -46,10 +46,34 @@
             <RouterLink
             v-if="user?.id === recipe.userId"
             :to="`/recettes/${recipe.id}/ingredients/add`"
-            class="border rounded-lg border-green-300 hover:bg-green-200 p-2 flex flex-col justify-center"
+            class="border rounded-lg border-black hover:bg-gray-200 flex flex-col justify-center col-span-3"
             >
               Ajouter un ingredient
             </RouterLink>
+          </div>
+
+          <!-- Section des étapes de préparation -->
+          <div v-if="recipe.steps && recipe.steps.length > 0" class="border rounded-lg border-blue-300 p-4 col-span-3 m-1">
+            <h3 class="text-xl font-bold mb-4">Étapes de préparation</h3>
+            <div class="space-y-4">
+              <div 
+                v-for="step in recipe.steps" 
+                :key="step.id"
+                class="border rounded-lg border-blue-200 p-4 hover:bg-blue-50 transition-colors"
+              >
+                <div class="flex items-start gap-3">
+                  <div class="shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
+                    {{ step.stepNumber }}
+                  </div>
+                  <div class="grow">
+                    <p class="text-gray-800">{{ step.description }}</p>
+                    <p v-if="step.durationMinutes" class="text-sm text-gray-500 mt-1">
+                      ⏱️ Durée: {{ step.durationMinutes }} min
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

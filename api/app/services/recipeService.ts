@@ -53,12 +53,16 @@ export default class RecipeService {
                 query.pivotColumns(['quantity', 'unit'])
             })
             .preload('user')
+            .preload('steps', (query) => {
+                query.orderBy('step_number', 'asc')
+            })
             .firstOrFail()
         
         return {
             id: recipe.id,
             name: recipe.name,
             description: recipe.description,
+            userId: recipe.userId,
             user: {
                 id: recipe.user.id,
                 fullName: recipe.user.fullName,
@@ -69,6 +73,12 @@ export default class RecipeService {
                 name: ingredient.name,
                 quantity: ingredient.$extras.pivot_quantity,
                 unit: ingredient.$extras.pivot_unit
+            })),
+            steps: recipe.steps.map((step) => ({
+                id: step.id,
+                stepNumber: step.stepNumber,
+                description: step.description,
+                durationMinutes: step.durationMinutes
             })),
             createdAt: recipe.createdAt.toISO(),
             updatedAt: recipe.updatedAt.toISO()

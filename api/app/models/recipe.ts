@@ -1,8 +1,9 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column, manyToMany } from '@adonisjs/lucid/orm'
+import { BaseModel, belongsTo, column, manyToMany, hasMany } from '@adonisjs/lucid/orm'
 import Ingredient from './ingredient.js'
-import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
+import type { BelongsTo, ManyToMany, HasMany } from '@adonisjs/lucid/types/relations'
 import User from './user.js'
+import RecipeStep from './recipeStep.js'
 
 export default class Recipe extends BaseModel {
   @column({ isPrimary: true })
@@ -28,6 +29,9 @@ export default class Recipe extends BaseModel {
     pivotTimestamps: true
   })
   declare ingredients: ManyToMany<typeof Ingredient>
+
+  @hasMany(() => RecipeStep)
+  declare steps: HasMany<typeof RecipeStep>
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

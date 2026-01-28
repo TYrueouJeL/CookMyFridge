@@ -9,6 +9,7 @@
 import AuthController from '#controllers/authController'
 import IngredientController from '#controllers/ingredientController'
 import RecipeController from '#controllers/recipeController'
+import RecipeStepController from '#controllers/recipeStepController'
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
 
@@ -39,6 +40,15 @@ router.group(() => {
     router.delete('/:ingredientId', [RecipeController, 'removeIngredient'])
   })
   .prefix('/:recipeId/ingredients').use(middleware.auth({ guards: ['api'] }))
+
+  router.group(() => {
+    router.get('/', [RecipeStepController, 'index'])
+    router.post('/', [RecipeStepController, 'store']).use(middleware.auth({ guards: ['api'] }))
+    router.get('/:stepId', [RecipeStepController, 'show'])
+    router.put('/:stepId', [RecipeStepController, 'update']).use(middleware.auth({ guards: ['api'] }))
+    router.delete('/:stepId', [RecipeStepController, 'delete']).use(middleware.auth({ guards: ['api'] }))
+  })
+  .prefix('/:recipeId/steps')
 })
 .prefix('/recipes')
 
