@@ -11,7 +11,7 @@ export interface UserDTO {
 }
 
 export interface CreateUserDTO {
-    fullName: string | null
+    fullName: string
     email: string
     password: string
 }

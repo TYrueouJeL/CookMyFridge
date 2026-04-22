@@ -1,5 +1,4 @@
 import RecipeStep from '#models/recipeStep'
-import { faker } from '@faker-js/faker'
 
 const stepDescriptions = [
   'Préparez tous les ingrédients',
