@@ -40,4 +40,12 @@ export default class AuthController {
             message: 'Déconnecté'
         })
     }
+
+    async me({ auth, response }: HttpContext) {
+        const user = auth.use('api').user
+
+        return response.ok({
+            user
+        })
+    }
 }

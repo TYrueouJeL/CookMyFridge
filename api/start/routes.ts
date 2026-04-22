@@ -20,7 +20,8 @@ router.get('/', async () => {
 
 router.post('/login', [AuthController, 'login'])
 router.post('/register', [AuthController, 'register'])
-router.post('/logout', [AuthController, 'logout']).use(middleware.auth({ guards: ['api']}))
+router.post('/logout', [AuthController, 'logout']).use(middleware.auth({ guards: ['api'] }))
+router.get('/me', [AuthController, 'me']).use(middleware.auth({ guards: ['api'] }))
 
 router.group(() => {
   router.get('/', [RecipeController, 'index'])

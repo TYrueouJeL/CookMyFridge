@@ -8,6 +8,8 @@ export default class IngredientService {
         return ingredients.map((ingredient) => ({
             id: ingredient.id,
             name: ingredient.name,
+            createdAt: ingredient.createdAt.toISO(),
+            updatedAt: ingredient.updatedAt.toISO()
         }))
     }
 
@@ -23,6 +25,8 @@ export default class IngredientService {
         return {
             id: ingredient.id,
             name: ingredient.name,
+            createdAt: ingredient.createdAt.toISO(),
+            updatedAt: ingredient.updatedAt.toISO()
         }
     }
 

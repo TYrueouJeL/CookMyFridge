@@ -22,4 +22,6 @@ export interface RecipeIngredientDTO {
     ingredientId: number
     quantity: number
     unit: UnitEnum
+    createdAt: string
+    updatedAt: string
 }

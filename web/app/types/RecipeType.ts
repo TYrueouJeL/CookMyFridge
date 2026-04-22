@@ -5,6 +5,8 @@ export interface RecipeType {
     name: string
     description: string
     ingredients: RecipeIngredientType[]
+    createdAt: string
+    updatedAt: string
 }
 
 export interface CreateRecipeDTO {

@@ -52,7 +52,32 @@ export default class AuthService {
     }
 
     static async logout() {
+        const response = await fetch(`${apiUrl}logout`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' }
+        })
+
         const { clearToken } = useAuth()
         clearToken()
+
+        if (!response.ok) {
+            const body = await response.json()
+            throw new Error(body.message ?? 'Erreur lors de la déconnexion')
+        }
+    }
+
+    static async getMe() {
+        const response = await fetch(`${apiUrl}me`, {
+            method: 'GET',
+            credentials: 'include'
+        })
+
+        if (!response.ok) {
+            const body = await response.json()
+            throw new Error(body.message ?? 'Erreur API')
+        }
+
+        return await response.json()
     }
 }
