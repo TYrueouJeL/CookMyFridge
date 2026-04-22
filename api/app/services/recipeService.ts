@@ -3,10 +3,23 @@ import { CreateRecipeDTO, UpdateRecipeDTO } from "../dto/recipeDTO.js";
 import { CreateRecipeIngredientDTO, RecipeIngredientDTO, UpdateRecipeIngredientDTO } from "../dto/recipeIngredientDTO.js";
 
 export default class RecipeService {
-    public async list() {
-        const recipes = await Recipe.query().preload('user')
+    public async list(page: number = 1, limit: number = 10, search: string = '') {
+        const offset = (page - 1) * limit
+        const query = Recipe.query().preload('user')
+        
+        if (search.trim()) {
+            query.where('name', 'LIKE', `%${search}%`)
+        }
+        
+        const recipes = await query.offset(offset).limit(limit)
+        
+        const countQuery = Recipe.query()
+        if (search.trim()) {
+            countQuery.where('name', 'LIKE', `%${search}%`)
+        }
+        const total = await countQuery.count('* as count').then(result => result[0].$extras.count)
 
-        return recipes.map((recipe) => ({
+        const data = recipes.map((recipe) => ({
             id: recipe.id,
             name: recipe.name,
             description: recipe.description,
@@ -18,6 +31,18 @@ export default class RecipeService {
             createdAt: recipe.createdAt.toISO(),
             updatedAt: recipe.updatedAt.toISO()
         }))
+
+        return {
+            total,
+            page,
+            limit,
+            data
+        }
+    }
+
+    public async count() {
+        const result = await Recipe.query().count('* as count')
+        return result[0].$extras.count
     }
 
     public async findById(id: number) {
@@ -28,12 +53,16 @@ export default class RecipeService {
                 query.pivotColumns(['quantity', 'unit'])
             })
             .preload('user')
+            .preload('steps', (query) => {
+                query.orderBy('step_number', 'asc')
+            })
             .firstOrFail()
         
         return {
             id: recipe.id,
             name: recipe.name,
             description: recipe.description,
+            userId: recipe.userId,
             user: {
                 id: recipe.user.id,
                 fullName: recipe.user.fullName,
@@ -44,6 +73,12 @@ export default class RecipeService {
                 name: ingredient.name,
                 quantity: ingredient.$extras.pivot_quantity,
                 unit: ingredient.$extras.pivot_unit
+            })),
+            steps: recipe.steps.map((step) => ({
+                id: step.id,
+                stepNumber: step.stepNumber,
+                description: step.description,
+                durationMinutes: step.durationMinutes
             })),
             createdAt: recipe.createdAt.toISO(),
             updatedAt: recipe.updatedAt.toISO()

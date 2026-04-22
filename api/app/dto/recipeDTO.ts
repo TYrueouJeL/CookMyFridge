@@ -30,6 +30,12 @@ export interface RecipeDTO {
         quantity: any
         unit: any
     }>
-    createdAt: string
-    updatedAt: string
+    steps?: Array<{
+        id: number
+        stepNumber: number
+        description: string
+        durationMinutes: number | null
+    }>
+    createdAt: string | null
+    updatedAt: string | null
 }

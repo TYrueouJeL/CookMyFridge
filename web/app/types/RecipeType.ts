@@ -1,10 +1,12 @@
 import type { RecipeIngredientType } from "./RecipeIngredientType"
+import type { RecipeStepType } from "./RecipeStepType"
 
 export interface RecipeType {
     id: number
     name: string
     description: string
     ingredients: RecipeIngredientType[]
+    steps?: RecipeStepType[]
     createdAt: string
     updatedAt: string
 }

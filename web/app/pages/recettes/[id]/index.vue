@@ -15,22 +15,24 @@
             <p>{{ recipe.description }}</p>
           </div>
 
-          <div>
-            <RouterLink
-            v-if="user?.id === recipe.userId"
-            :to="`/recettes/${recipe.id}/ingredients/add`"
-            class="border border-gray-400 hover:bg-gray-200 rounded-lg m-1 px-3 py-2 flex items-center justify-center text-center h-min"
-            >
-              Ajouter un ingredient
-            </RouterLink>
-
-            <div class="border border-gray-400 rounded-lg m-1 px-3 py-2 h-min">
-              <p class="font-semibold">Auteur : {{ recipe.user.fullName }}</p>
+          <div class="h-full flex flex-col justify-between">
+            <div class="border border-gray-400 rounded-lg m-1 px-3 py-2 h-full flex flex-col justify-center">
+              <p class="font-semibold">Auteur : {{ recipe.userId == user?.id ? 'Vous' : recipe.user.fullName }}</p>
               <p class="text-sm text-gray-600">Créée {{ formatRelativeTime(recipe.createdAt) }}</p>
               <p class="text-xs text-gray-500">{{ formatDate(recipe.createdAt) }}</p>
               <p v-if="recipe.updatedAt !== recipe.createdAt" class="text-xs text-gray-500">
                 Modifiée {{ formatRelativeTime(recipe.updatedAt) }}
               </p>
+            </div>
+
+            <div class="m-1">
+              <button
+              v-if="user?.id === recipe.userId"
+              @click="showDeleteModal = true"
+              class="border border-red-400 hover:bg-red-200 rounded-lg px-3 py-2 cursor-pointer flex items-center justify-center text-center h-min w-full"
+              >
+                Supprimer la recette
+              </button>
             </div>
           </div>
 
@@ -40,10 +42,64 @@
               <p>{{ ingredient.name }}</p>
               <p>Quantitée : {{ ingredient.quantity }}{{ ingredient.unit }}</p>
             </div>
+
+            <RouterLink
+            v-if="user?.id === recipe.userId"
+            :to="`/recettes/${recipe.id}/ingredients/add`"
+            class="border rounded-lg border-black hover:bg-gray-200 flex flex-col justify-center col-span-3"
+            >
+              Ajouter un ingredient
+            </RouterLink>
+          </div>
+
+          <!-- Section des étapes de préparation -->
+          <div v-if="recipe.steps && recipe.steps.length > 0" class="border rounded-lg border-blue-300 p-4 col-span-3 m-1">
+            <h3 class="text-xl font-bold mb-4">Étapes de préparation</h3>
+            <div class="space-y-4">
+              <div 
+                v-for="step in recipe.steps" 
+                :key="step.id"
+                class="border rounded-lg border-blue-200 p-4 hover:bg-blue-50 transition-colors"
+              >
+                <div class="flex items-start gap-3">
+                  <div class="shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">
+                    {{ step.stepNumber }}
+                  </div>
+                  <div class="grow">
+                    <p class="text-gray-800">{{ step.description }}</p>
+                    <p v-if="step.durationMinutes" class="text-sm text-gray-500 mt-1">
+                      ⏱️ Durée: {{ step.durationMinutes }} min
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </AsyncState>
+
+    <!-- Modal de confirmation -->
+    <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 max-w-md">
+        <h3 class="text-xl font-bold mb-4">Confirmer la suppression</h3>
+        <p class="mb-6">Êtes-vous sûr de vouloir supprimer la recette "{{ recipe?.name }}" ?</p>
+        <div class="flex gap-4 justify-end">
+          <button 
+            @click="showDeleteModal = false"
+            class="border border-gray-400 hover:bg-gray-200 rounded-lg px-4 py-2"
+          >
+            Annuler
+          </button>
+          <button 
+            @click="confirmDelete"
+            class="bg-red-500 hover:bg-red-600 text-white rounded-lg px-4 py-2"
+          >
+            Supprimer
+          </button>
+        </div>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -57,8 +113,10 @@ import { useDate } from '../../../composables/useDate';
 
 const { isAuthenticated } = useAuth()
 const { formatDate, formatRelativeTime } = useDate()
+const showDeleteModal = ref(false)
 
 const route = useRoute()
+const router = useRouter()
 
 // Charger les deux données en parallèle
 const { data: pageData, pending: loading, error } = await useAsyncData(
@@ -80,6 +138,18 @@ const { data: pageData, pending: loading, error } = await useAsyncData(
 
 const recipe = computed(() => pageData.value?.recipe)
 const user = computed(() => pageData.value?.user)
+
+const confirmDelete = async () => {
+  try {
+    await RecipeService.delete(Number(route.params.id))
+    showDeleteModal.value = false
+    router.push('/recettes')
+  } catch (error) {
+    console.error('Erreur lors de la suppression:', error)
+    alert(`Erreur lors de la suppression de la recette: ${error.message}`)
+    showDeleteModal.value = false
+  }
+}
 
 useHead(() => ({
   title: recipe.value

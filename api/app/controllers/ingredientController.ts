@@ -11,6 +11,11 @@ export default class IngredientController {
         return response.ok(ingredients)
     }
 
+    public async count({ response }: HttpContext) {
+        const count = await this.ingredientService.count()
+        return response.ok({ count })
+    }
+
     public async show({ params, response }: HttpContext) {
         const ingredientId = params.ingredientId
         const ingredient = await this.ingredientService.findById(ingredientId)

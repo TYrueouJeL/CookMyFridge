@@ -3,8 +3,27 @@ import type { CreateRecipeDTO, UpdateRecipeDTO } from "~/types/RecipeType";
 const apiUrl = import.meta.env.VITE_API_URL
 
 export default class RecipeService {
-    static async getAll() {
-        const response = await fetch(`${apiUrl}recipes`, {
+    static async getAll(page: number = 1, limit: number = 10, search: string = '') {
+        const params = new URLSearchParams({
+            page: page.toString(),
+            limit: limit.toString(),
+            ...(search ? { search } : {})
+        })
+        const response = await fetch(`${apiUrl}recipes?${params}`, {
+            method: 'GET',
+            credentials: 'include',
+        })
+    
+        if (!response.ok) {
+            const body = await response.json()
+            throw new Error(body.message ?? 'Erreur API')
+        }
+    
+        return response.json()
+    }
+
+    static async count() {
+        const response = await fetch(`${apiUrl}recipes/count`, {
             method: 'GET',
             credentials: 'include',
         })
@@ -72,6 +91,11 @@ export default class RecipeService {
         if (!response.ok) {
             const body = await response.json()
             throw new Error(body.message ?? 'Erreur API')
+        }
+    
+        // 204 No Content n'a pas de body
+        if (response.status === 204) {
+            return null
         }
     
         return response.json()

@@ -17,10 +17,13 @@ test.group('Recipes controller', (group) => {
     const response = await client.get('/recipes').send()
 
     assert.equal(response.status(), 200)
-    assert.lengthOf(response.body(), 2)
-    assert.equal(response.body()[0].name, 'Pizza')
-    assert.equal(response.body()[0].description, 'This is a Pizza')
-    assert.equal(response.body()[0].user.id, user.id)
+    assert.equal(response.body().total, 2)
+    assert.equal(response.body().page, 1)
+    assert.equal(response.body().limit, 10)
+    assert.lengthOf(response.body().data, 2)
+    assert.equal(response.body().data[0].name, 'Pizza')
+    assert.equal(response.body().data[0].description, 'This is a Pizza')
+    assert.equal(response.body().data[0].user.id, user.id)
   })
 
   test('POST /recipes', async ({ client, assert }) => {
