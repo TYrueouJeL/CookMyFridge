@@ -124,29 +124,6 @@ npm run build
 npm run preview
 ```
 
-## Scripts disponibles
-
-### Backend (API)
-
-```bash
-npm run dev          # Serveur de développement avec HMR
-npm run build        # Build pour production
-npm start            # Démarrer le serveur de production
-npm test             # Exécuter les tests
-npm run lint         # Linter le code
-npm run format       # Formater le code avec Prettier
-npm run typecheck    # Vérification des types TypeScript
-```
-
-### Frontend (Web)
-
-```bash
-npm run dev          # Serveur de développement
-npm run build        # Build pour production
-npm run generate     # Génération statique
-npm run preview      # Preview du build de production
-```
-
 ## Fonctionnalités
 
 - **Gestion des ingrédients** : Ajouter, modifier et supprimer des ingrédients
