@@ -38,7 +38,7 @@
                     </a>
 
                     <a
-                    v-if="!isAuthenticated"
+                    v-if="isAuthenticated"
                     href="/compte"
                     class="relative text-gray-700 transition-colors duration-300
                             hover:text-green-600
