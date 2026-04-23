@@ -8,17 +8,23 @@ jobs:
     test-api:
         runs-on: ubuntu-latest
 
-        services:
-            mysql:
-                image: mysql:8.0
-                env:
-                    MYSQL_ROOT_PASSWORD: root
-                    MYSQL_DATABASE: cookmyfridge_test
-                ports:
-                    - 3306:3306
-                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
         steps:
             - uses: actions/checkout@v4
+            
+            - name: Start MySQL
+              run: |
+                docker run -d --rm \
+                  --name mysql-test \
+                  --network host \
+                  -e MYSQL_ROOT_PASSWORD=root \
+                  -e MYSQL_DATABASE=cookmyfridge_test \
+                  -p 3306:3306 \
+                  mysql:8.0
+
+                until docker exec mysql-test mysqladmin ping -h 127.0.0.1 -uroot -proot --silent; do
+                  echo "Waiting for MySQL..."
+                  sleep 2
+                done
 
             - uses: actions/setup-node@v4
               with:
@@ -41,6 +47,9 @@ jobs:
                 DB_DATABASE: cookmyfridge_test
                 APP_KEY: ${{ secrets.APP_KEY }}
                 NODE_ENV: test
+                PORT: 3333        
+                HOST: 0.0.0.0    
+                LOG_LEVEL: info  
               run: node ace migration:run --force
 
             - name: Run tests
@@ -53,8 +62,14 @@ jobs:
                 DB_PASSWORD: root
                 DB_DATABASE: cookmyfridge_test
                 APP_KEY: ${{ secrets.APP_KEY }}
-                NODE_ENV: test
+                NODE_ENV: test 
+                HOST: 0.0.0.0    
+                LOG_LEVEL: info  
               run: node ace test
+            
+            - name: Stop MySQL
+              if: always()
+              run: docker rm -f mysql-test || true
 
     test-web:
         runs-on: ubuntu-latest
