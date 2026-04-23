@@ -44,6 +44,8 @@ services:
     build:
       context: .
       dockerfile: docker/web/Dockerfile
+      args:
+        VITE_API_URL: /api/
     container_name: cookmyfridge-web
     environment:
       - VITE_API_URL=/api/
