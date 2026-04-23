@@ -1,0 +1,13 @@
+{
+    email guerinremi.pro@gmail.com
+}
+
+cook.remiguerin.fr {
+    handle /api/* {
+        reverse_proxy api:3333
+    }
+    
+    handle {
+        reverse_proxy web:3000
+    }
+}

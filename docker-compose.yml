@@ -1,4 +1,19 @@
 services:
+  caddy:
+    image: caddy:alpine
+    container_name: cookmyfridge-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - web
+    restart: unless-stopped
+
   mysql:
     image: mysql:8.0
     container_name: cookmyfridge-mysql
@@ -34,7 +49,7 @@ services:
       DB_PASSWORD: root
       DB_DATABASE: cookmyfridge
     ports:
-      - "3333:3333"
+      - "3333"
     depends_on:
       - mysql
     restart: unless-stopped
@@ -45,10 +60,12 @@ services:
       dockerfile: docker/web/Dockerfile
     container_name: cookmyfridge-web
     ports:
-      - "3000:3000"
+      - "3000"
     depends_on:
       - api
     restart: unless-stopped
 
 volumes:
   mysql_data:
+  caddy_data:
+  caddy_config:
