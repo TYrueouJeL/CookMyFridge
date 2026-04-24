@@ -28,7 +28,9 @@ jobs:
                 context: .
                 file: docker/api/Dockerfile
                 push: true
-                tags: ${{ env.IMAGE_API }}:latest
+                tags: |
+                    ${{ env.IMAGE_API }}:latest
+                    ${{ env.IMAGE_API }}:${{ github.sha }}
 
             - name: Build and Push Web
               uses: docker/build-push-action@v5
@@ -38,7 +40,9 @@ jobs:
                 push: true
                 build-args: |
                     VITE_API_URL=/api/
-                tags: ${{ env.IMAGE_WEB }}:latest
+                tags: | 
+                    ${{ env.IMAGE_WEB }}:latest
+                    ${{ env.IMAGE_WEB }}:${{ github.sha }}
         
     deploy:
         runs-on: ubuntu-latest
