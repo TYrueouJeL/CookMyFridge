@@ -1,6 +1,20 @@
 import { useApiClient } from "~/composables/useApiClient";
-import type { CreateRecipeIngredientDTO, UpdateRecipeIngredientDTO } from "~/types/RecipeIngredientType";
-import type { CreateRecipeDTO, UpdateRecipeDTO } from "~/types/RecipeType";
+import type { CreateRecipeIngredientDTO, UpdateRecipeIngredientDTO, RecipeIngredientType } from "~/types/RecipeIngredientType";
+import type { CreateRecipeDTO, UpdateRecipeDTO, RecipeType } from "~/types/RecipeType";
+
+interface PaginatedRecipes {
+  data: RecipeType[]
+  meta: {
+    total: number
+    perPage: number
+    currentPage: number
+    lastPage: number
+  }
+}
+
+interface CountResult {
+  count: number
+}
 
 export default class RecipeService {
   static async getAll(page: number = 1, limit: number = 10, search: string = '') {
@@ -10,22 +24,22 @@ export default class RecipeService {
       limit: limit.toString(),
       ...(search ? { search } : {})
     })
-    return api(`recipes?${params}`)
+    return api<PaginatedRecipes>(`recipes?${params}`)
   }
 
   static async count() {
     const api = useApiClient()
-    return api('recipes/count')
+    return api<CountResult>('recipes/count')
   }
 
   static async getById(id: number) {
     const api = useApiClient()
-    return api(`recipes/${id}`)
+    return api<RecipeType>(`recipes/${id}`)
   }
 
   static async create(data: CreateRecipeDTO) {
     const api = useApiClient()
-    return api('recipes', {
+    return api<RecipeType>('recipes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -34,7 +48,7 @@ export default class RecipeService {
 
   static async update(id: number, data: UpdateRecipeDTO) {
     const api = useApiClient()
-    return api(`recipes/${id}`, {
+    return api<RecipeType>(`recipes/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -43,9 +57,7 @@ export default class RecipeService {
 
   static async delete(id: number) {
     const api = useApiClient()
-    // $fetch lance une erreur sur 4xx/5xx automatiquement
-    // Pour le 204 No Content, $fetch retourne null tout seul
-    return api(`recipes/${id}`, { method: 'DELETE' }).catch((err) => {
+    return api<null>(`recipes/${id}`, { method: 'DELETE' }).catch((err) => {
       if (err?.response?.status === 204) return null
       throw err
     })
@@ -53,17 +65,17 @@ export default class RecipeService {
 
   static async getIngredients(recipeId: number) {
     const api = useApiClient()
-    return api(`recipes/${recipeId}/ingredients`)
+    return api<RecipeIngredientType[]>(`recipes/${recipeId}/ingredients`)
   }
 
   static async getIngredient(recipeId: number, ingredientId: number) {
     const api = useApiClient()
-    return api(`recipes/${recipeId}/ingredients/${ingredientId}`)
+    return api<RecipeIngredientType>(`recipes/${recipeId}/ingredients/${ingredientId}`)
   }
 
   static async addIngredient(recipeId: number, data: CreateRecipeIngredientDTO) {
     const api = useApiClient()
-    return api(`recipes/${recipeId}/ingredients`, {
+    return api<RecipeIngredientType>(`recipes/${recipeId}/ingredients`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -72,7 +84,7 @@ export default class RecipeService {
 
   static async updateIngredient(recipeId: number, ingredientId: number, data: UpdateRecipeIngredientDTO) {
     const api = useApiClient()
-    return api(`recipes/${recipeId}/ingredients/${ingredientId}`, {
+    return api<RecipeIngredientType>(`recipes/${recipeId}/ingredients/${ingredientId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -81,7 +93,7 @@ export default class RecipeService {
 
   static async removeIngredient(recipeId: number, ingredientId: number) {
     const api = useApiClient()
-    return api(`recipes/${recipeId}/ingredients/${ingredientId}`, {
+    return api<null>(`recipes/${recipeId}/ingredients/${ingredientId}`, {
       method: 'DELETE',
     })
   }
