@@ -42,7 +42,7 @@ services:
     image: tyrueoujel/cookmyfridge-web:latest
     container_name: cookmyfridge-web
     environment:
-      - VITE_API_URL=/api/
+      - VITE_API_URL=http://localhost:3333/
     ports:
       - "3000:3000"
     depends_on:
