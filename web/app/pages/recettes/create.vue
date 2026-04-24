@@ -53,7 +53,7 @@
 
 <script setup lang="ts">
 import RecipeService from '~/services/api/recipeApi'
-import type { CreateRecipeDTO } from '~/types/RecipeType'
+import type { CreateRecipeDTO, RecipeType } from '~/types/RecipeType'
 
 const router = useRouter()
 
@@ -96,7 +96,7 @@ const submit = async () => {
     error.value = null
 
     try {
-        const recipe = await RecipeService.create({
+        const recipe: RecipeType = await RecipeService.create({
             name: form.name,
             description: form.description
         })
