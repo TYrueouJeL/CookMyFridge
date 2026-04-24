@@ -1,177 +1,88 @@
+import { useApiClient } from "~/composables/useApiClient";
 import type { CreateRecipeIngredientDTO, UpdateRecipeIngredientDTO } from "~/types/RecipeIngredientType";
 import type { CreateRecipeDTO, UpdateRecipeDTO } from "~/types/RecipeType";
-const apiUrl = import.meta.env.VITE_API_URL
 
 export default class RecipeService {
-    static async getAll(page: number = 1, limit: number = 10, search: string = '') {
-        const params = new URLSearchParams({
-            page: page.toString(),
-            limit: limit.toString(),
-            ...(search ? { search } : {})
-        })
-        const response = await fetch(`${apiUrl}recipes?${params}`, {
-            method: 'GET',
-            credentials: 'include',
-        })
-    
-        if (!response.ok) {
-            const body = await response.json()
-            throw new Error(body.message ?? 'Erreur API')
-        }
-    
-        return response.json()
-    }
+  static async getAll(page: number = 1, limit: number = 10, search: string = '') {
+    const api = useApiClient()
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      ...(search ? { search } : {})
+    })
+    return api(`recipes?${params}`)
+  }
 
-    static async count() {
-        const response = await fetch(`${apiUrl}recipes/count`, {
-            method: 'GET',
-            credentials: 'include',
-        })
-    
-        if (!response.ok) {
-            const body = await response.json()
-            throw new Error(body.message ?? 'Erreur API')
-        }
-    
-        return response.json()
-    }
+  static async count() {
+    const api = useApiClient()
+    return api('recipes/count')
+  }
 
-    static async getById(id: number) {
-        const response = await fetch(`${apiUrl}recipes/${id}`, {
-            method: 'GET',
-            credentials: 'include',
-        })
-    
-        if (!response.ok) {
-            const body = await response.json()
-            throw new Error(body.message ?? 'Erreur API')
-        }
-    
-        return response.json()
-    }
+  static async getById(id: number) {
+    const api = useApiClient()
+    return api(`recipes/${id}`)
+  }
 
-    static async create(data: CreateRecipeDTO) {
-        const response = await fetch(`${apiUrl}recipes`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        })
-    
-        if (!response.ok) {
-            const body = await response.json()
-            throw new Error(body.message ?? 'Erreur API')
-        }
-    
-        return response.json()
-    }
+  static async create(data: CreateRecipeDTO) {
+    const api = useApiClient()
+    return api('recipes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+  }
 
-    static async update(id: number, data: UpdateRecipeDTO) {
-        const response = await fetch(`${apiUrl}recipes/${id}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        })
-    
-        if (!response.ok) {
-            const body = await response.json()
-            throw new Error(body.message ?? 'Erreur API')
-        }
-    
-        return response.json()
-    }
+  static async update(id: number, data: UpdateRecipeDTO) {
+    const api = useApiClient()
+    return api(`recipes/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+  }
 
-    static async delete(id: number) {
-        const response = await fetch(`${apiUrl}recipes/${id}`, {
-            method: 'DELETE',
-            credentials: 'include',
-        })
-    
-        if (!response.ok) {
-            const body = await response.json()
-            throw new Error(body.message ?? 'Erreur API')
-        }
-    
-        // 204 No Content n'a pas de body
-        if (response.status === 204) {
-            return null
-        }
-    
-        return response.json()
-    }
+  static async delete(id: number) {
+    const api = useApiClient()
+    // $fetch lance une erreur sur 4xx/5xx automatiquement
+    // Pour le 204 No Content, $fetch retourne null tout seul
+    return api(`recipes/${id}`, { method: 'DELETE' }).catch((err) => {
+      if (err?.response?.status === 204) return null
+      throw err
+    })
+  }
 
-    static async getIngredients(recipeId: number) {
-        const response = await fetch(`${apiUrl}recipes/${recipeId}/ingredients`, {
-            method: 'GET',
-            credentials: 'include'
-        })
+  static async getIngredients(recipeId: number) {
+    const api = useApiClient()
+    return api(`recipes/${recipeId}/ingredients`)
+  }
 
-        if (!response.ok) {
-            const body = await response.json()
-            throw new Error(body.message ?? 'Erreur API')
-        }
+  static async getIngredient(recipeId: number, ingredientId: number) {
+    const api = useApiClient()
+    return api(`recipes/${recipeId}/ingredients/${ingredientId}`)
+  }
 
-        return response.json()
-    }
+  static async addIngredient(recipeId: number, data: CreateRecipeIngredientDTO) {
+    const api = useApiClient()
+    return api(`recipes/${recipeId}/ingredients`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+  }
 
-    static async getIngredient(recipeId: number, ingredientId: number) {
-        const response = await fetch(`${apiUrl}recipes/${recipeId}/ingredients/${ingredientId}`, {
-            method: 'GET',
-            credentials: 'include'
-        })
+  static async updateIngredient(recipeId: number, ingredientId: number, data: UpdateRecipeIngredientDTO) {
+    const api = useApiClient()
+    return api(`recipes/${recipeId}/ingredients/${ingredientId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+  }
 
-        if (!response.ok) {
-            const body = await response.json()
-            throw new Error(body.message ?? 'Erreur API')
-        }
-
-        return response.json()
-    }
-
-    static async addIngredient(recipeId: number, data: CreateRecipeIngredientDTO) {
-        const response = await fetch(`${apiUrl}recipes/${recipeId}/ingredients`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-
-        if (!response.ok) {
-            const body = await response.json()
-            throw new Error(body.message ?? 'Erreur API')
-        }
-
-        return response.json()
-    }
-
-    static async updateIngredient(recipeId: number, ingredientId: number, data: UpdateRecipeIngredientDTO) {
-        const response = await fetch(`${apiUrl}recipes/${recipeId}/ingredients/${ingredientId}`, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-
-        if (!response.ok) {
-            const body = await response.json()
-            throw new Error(body.message ?? 'Erreur API')
-        }
-
-        return response.json()
-    }
-
-    static async removeIngredient(recipeId: number, ingredientId: number) {
-        const response = await fetch(`${apiUrl}recipes/${recipeId}/ingredients/${ingredientId}`, {
-            method: 'DELETE',
-            credentials: 'include'
-        })
-
-        if (!response.ok) {
-            const body = await response.json()
-            throw new Error(body.message ?? 'Erreur API')
-        }
-
-        return response.json()
-    }
+  static async removeIngredient(recipeId: number, ingredientId: number) {
+    const api = useApiClient()
+    return api(`recipes/${recipeId}/ingredients/${ingredientId}`, {
+      method: 'DELETE',
+    })
+  }
 }
